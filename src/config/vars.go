@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strconv"
 
 	"github.com/samber/lo"
 )
@@ -13,6 +14,9 @@ var DBUrl string
 var DBLogging string
 
 var Port string
+
+var JWTSigningKey string
+var JWTExpirationDays int
 
 // should run after env.go#init as this `vars` is alphabetically after `env`
 func init() {
@@ -31,4 +35,7 @@ func init() {
 	DBLogging = os.Getenv("DB_LOGGING")
 
 	Port = os.Getenv("PORT")
+
+	JWTSigningKey = os.Getenv("JWT_SIGNING_KEY")
+	JWTExpirationDays, _ = strconv.Atoi(os.Getenv("JWT_EXPIRATION_DAYS"))
 }

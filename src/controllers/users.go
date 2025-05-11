@@ -44,3 +44,12 @@ func (c *UsersController) CreateUser(req *dto.CreateUserRequest) (*dto.UserRespo
 		Token:    "", // Will be implemented with JWT
 	}, nil
 }
+
+func (c *UsersController) GetUserByID(id uint) (*models.User, error) {
+	var user models.User
+	if err := c.db.Where("id = ?", id).First(&user).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusNotFound, "User not found")
+	}
+
+	return &user, nil
+}

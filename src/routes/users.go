@@ -30,7 +30,6 @@ func UsersRoute() func(router fiber.Router) {
 // @Param user body dto.CreateUserRequest true "User"
 // @Router /users [post]
 func registerUser(ctx *fiber.Ctx) error {
-
 	u, parseError := parsers.ParseBody[dto.CreateUserRequest](ctx)
 	if parseError != nil {
 		return parsers.SendParsingError(ctx, parseError)
@@ -41,7 +40,14 @@ func registerUser(ctx *fiber.Ctx) error {
 		return validators.SendValidationError(ctx, validateErr)
 	}
 
-	return ctx.Status(fiber.StatusCreated).JSON(u)
+	user, err := usersController.CreateUser(u)
+	if err != nil {
+		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
+	}
+
+	// TODO: Generate JWT token here when implementing authentication
+	// TODO: Do not return password hash
+	return ctx.Status(fiber.StatusCreated).JSON(user)
 }
 
 // @Summary Login a user

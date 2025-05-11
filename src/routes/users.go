@@ -59,5 +59,20 @@ func registerUser(ctx *fiber.Ctx) error {
 // @Param user body dto.LoginUserRequest true "User"
 // @Router /users/login [post]
 func loginUser(ctx *fiber.Ctx) error {
-	return ctx.SendString("PLACEHOLDER: login user")
+	u, parseError := parsers.ParseBody[dto.LoginUserRequest](ctx)
+	if parseError != nil {
+		return parsers.SendParsingError(ctx, parseError)
+	}
+
+	validateErr := validators.ValidateLoginUserRequest(u)
+	if validateErr != nil {
+		return validators.SendValidationError(ctx, validateErr)
+	}
+
+	user, err := usersController.LoginUser(u)
+	if err != nil {
+		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(user)
 }

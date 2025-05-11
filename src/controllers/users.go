@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"strconv"
+
 	"github.com/championswimmer/api.midpoint.place/src/db"
 	"github.com/championswimmer/api.midpoint.place/src/db/models"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
@@ -52,4 +54,23 @@ func (c *UsersController) GetUserByID(id uint) (*models.User, error) {
 	}
 
 	return &user, nil
+}
+
+func (c *UsersController) LoginUser(req *dto.LoginUserRequest) (*dto.UserResponse, error) {
+	var user models.User
+	if err := c.db.Where("username = ?", req.Username).First(&user).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusNotFound, "User not found")
+	}
+
+	if !security.CheckPasswordHash(user.Password, req.Password) {
+		return nil, fiber.NewError(fiber.StatusUnauthorized, "Invalid password")
+	}
+
+	token := security.CreateJWTFromUser(&user)
+
+	return &dto.UserResponse{
+		Id:       strconv.FormatUint(uint64(user.ID), 10),
+		Username: user.Username,
+		Token:    token,
+	}, nil
 }

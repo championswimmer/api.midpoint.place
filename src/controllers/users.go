@@ -41,7 +41,7 @@ func (c *UsersController) CreateUser(req *dto.CreateUserRequest) (*dto.UserRespo
 
 	// TODO: Generate JWT token here when implementing authentication
 	return &dto.UserResponse{
-		Id:       string(user.ID),
+		Id:       strconv.FormatUint(uint64(user.ID), 10),
 		Username: user.Username,
 		Token:    "", // Will be implemented with JWT
 	}, nil

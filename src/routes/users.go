@@ -1,13 +1,18 @@
 package routes
 
 import (
+	"github.com/championswimmer/api.midpoint.place/src/controllers"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
 	"github.com/championswimmer/api.midpoint.place/src/server/parsers"
 	"github.com/championswimmer/api.midpoint.place/src/server/validators"
 	"github.com/gofiber/fiber/v2"
 )
 
+var usersController *controllers.UsersController
+
 func UsersRoute() func(router fiber.Router) {
+
+	usersController = controllers.CreateUsersController()
 
 	return func(router fiber.Router) {
 		router.Post("/", registerUser)

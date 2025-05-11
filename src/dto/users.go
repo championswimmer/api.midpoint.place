@@ -7,8 +7,18 @@ type CreateUserRequest struct {
 
 type LoginUserRequest = CreateUserRequest
 
+type Location struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+}
+
+type UserUpdateRequest struct {
+	Location Location `json:"location"`
+}
+
 type UserResponse struct {
-	Id       string `json:"id"`
-	Username string `json:"username"`
-	Token    string `json:"token"`
+	Id       string   `json:"id"`
+	Username string   `json:"username"`
+	Token    string   `json:"token"`
+	Location Location `json:"location,omitempty"`
 }

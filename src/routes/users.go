@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"strconv"
+
 	"github.com/championswimmer/api.midpoint.place/src/controllers"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
 	"github.com/championswimmer/api.midpoint.place/src/server/parsers"
@@ -17,6 +19,7 @@ func UsersRoute() func(router fiber.Router) {
 	return func(router fiber.Router) {
 		router.Post("/", registerUser)
 		router.Post("/login", loginUser)
+		router.Post("/:userid", updateUserData)
 	}
 
 }
@@ -75,4 +78,37 @@ func loginUser(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(user)
+}
+
+// @Summary Update user location
+// @Description Update location details for a user
+// @Tags users
+// @ID update-user-location
+// @Accept json
+// @Produce json
+// @Param userid path string true "User ID"
+// @Param location body dto.UserUpdateLocationRequest true "Location"
+// @Router /users/{userid} [post]
+func updateUserData(ctx *fiber.Ctx) error {
+	userID, err := strconv.ParseUint(ctx.Params("userid"), 10, 32)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.CreateErrorResponse(fiber.StatusBadRequest, "Invalid user ID"))
+	}
+
+	req, parseError := parsers.ParseBody[dto.UserUpdateRequest](ctx)
+	if parseError != nil {
+		return parsers.SendParsingError(ctx, parseError)
+	}
+
+	validateErr := validators.ValidateLocation(req.Location)
+	if validateErr != nil {
+		return validators.SendValidationError(ctx, validateErr)
+	}
+
+	user, err := usersController.UpdateUserLocation(uint(userID), req)
+	if err != nil {
+		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
+	}
+
+	return ctx.Status(fiber.StatusAccepted).JSON(user)
 }

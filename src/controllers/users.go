@@ -39,11 +39,16 @@ func (c *UsersController) CreateUser(req *dto.CreateUserRequest) (*dto.UserRespo
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to create user")
 	}
 
-	// TODO: Generate JWT token here when implementing authentication
+	token := security.CreateJWTFromUser(&user)
+
 	return &dto.UserResponse{
 		Id:       strconv.FormatUint(uint64(user.ID), 10),
 		Username: user.Username,
-		Token:    "", // Will be implemented with JWT
+		Token:    token,
+		Location: dto.Location{
+			Latitude:  user.Latitude,
+			Longitude: user.Longitude,
+		},
 	}, nil
 }
 
@@ -62,7 +67,7 @@ func (c *UsersController) LoginUser(req *dto.LoginUserRequest) (*dto.UserRespons
 		return nil, fiber.NewError(fiber.StatusNotFound, "User not found")
 	}
 
-	if !security.CheckPasswordHash(user.Password, req.Password) {
+	if !security.CheckPasswordHash(req.Password, user.Password) {
 		return nil, fiber.NewError(fiber.StatusUnauthorized, "Invalid password")
 	}
 
@@ -72,5 +77,36 @@ func (c *UsersController) LoginUser(req *dto.LoginUserRequest) (*dto.UserRespons
 		Id:       strconv.FormatUint(uint64(user.ID), 10),
 		Username: user.Username,
 		Token:    token,
+		Location: dto.Location{
+			Latitude:  user.Latitude,
+			Longitude: user.Longitude,
+		},
+	}, nil
+}
+
+func (c *UsersController) UpdateUserLocation(userID uint, req *dto.UserUpdateRequest) (*dto.UserResponse, error) {
+	var user models.User
+	if err := c.db.Where("id = ?", userID).First(&user).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusNotFound, "User not found")
+	}
+
+	// Update location
+	user.Latitude = req.Location.Latitude
+	user.Longitude = req.Location.Longitude
+
+	if err := c.db.Save(&user).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to update user location")
+	}
+
+	token := security.CreateJWTFromUser(&user)
+
+	return &dto.UserResponse{
+		Id:       strconv.FormatUint(uint64(user.ID), 10),
+		Username: user.Username,
+		Token:    token,
+		Location: dto.Location{
+			Latitude:  user.Latitude,
+			Longitude: user.Longitude,
+		},
 	}, nil
 }

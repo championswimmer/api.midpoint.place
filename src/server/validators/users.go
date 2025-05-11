@@ -23,3 +23,19 @@ func ValidateLoginUserRequest(dto *dto.LoginUserRequest) *ValidationError {
 	}
 	return nil
 }
+
+func ValidateLocation(location dto.Location) *ValidationError {
+	if location.Latitude < -90 || location.Latitude > 90 {
+		return &ValidationError{
+			status:  fiber.StatusBadRequest,
+			message: "Invalid latitude value. Must be between -90 and 90",
+		}
+	}
+	if location.Longitude < -180 || location.Longitude > 180 {
+		return &ValidationError{
+			status:  fiber.StatusBadRequest,
+			message: "Invalid longitude value. Must be between -180 and 180",
+		}
+	}
+	return nil
+}

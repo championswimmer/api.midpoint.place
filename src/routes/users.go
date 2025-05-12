@@ -87,7 +87,7 @@ func loginUser(ctx *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param userid path string true "User ID"
-// @Param location body dto.UserUpdateLocationRequest true "Location"
+// @Param user body dto.UserUpdateRequest true "User"
 // @Router /users/{userid} [post]
 func updateUserData(ctx *fiber.Ctx) error {
 	userID, err := strconv.ParseUint(ctx.Params("userid"), 10, 32)

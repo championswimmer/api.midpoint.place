@@ -15,8 +15,10 @@ require (
 )
 
 require (
+	github.com/gofiber/swagger v1.1.1 // indirect
 	github.com/gofiber/utils v0.0.10 // indirect
 	github.com/gorilla/schema v1.1.0 // indirect
+	github.com/swaggo/files/v2 v2.0.2 // indirect
 )
 
 require (

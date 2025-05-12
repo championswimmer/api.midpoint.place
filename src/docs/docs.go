@@ -15,6 +15,125 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/groups": {
+            "post": {
+                "description": "Create a new group",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groups"
+                ],
+                "summary": "Create a new group",
+                "operationId": "create-group",
+                "parameters": [
+                    {
+                        "description": "Group",
+                        "name": "group",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateGroupRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GroupResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/groups/{groupid}": {
+            "patch": {
+                "description": "Update an existing group's details",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groups"
+                ],
+                "summary": "Update an existing group",
+                "operationId": "update-group",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Group ID",
+                        "name": "groupid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Group Update Data",
+                        "name": "group",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateGroupRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GroupResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "post": {
                 "description": "Register a new user",
@@ -70,9 +189,87 @@ const docTemplate = `{
                 ],
                 "responses": {}
             }
+        },
+        "/users/{userid}": {
+            "post": {
+                "description": "Update location details for a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update user location",
+                "operationId": "update-user-location",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "User",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
         }
     },
     "definitions": {
+        "config.GroupType": {
+            "type": "string",
+            "enum": [
+                "public",
+                "protected",
+                "private"
+            ],
+            "x-enum-varnames": [
+                "GroupTypePublic",
+                "GroupTypeProtected",
+                "GroupTypePrivate"
+            ]
+        },
+        "dto.CreateGroupRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "radius": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "secret": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "public",
+                        "protected",
+                        "private"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/config.GroupType"
+                        }
+                    ]
+                }
+            }
+        },
         "dto.CreateUserRequest": {
             "type": "object",
             "properties": {
@@ -84,6 +281,59 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Something went wrong"
+                },
+                "status": {
+                    "type": "integer",
+                    "example": 400
+                }
+            }
+        },
+        "dto.GroupResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "creator_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "midpoint_latitude": {
+                    "type": "number"
+                },
+                "midpoint_longitude": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "radius": {
+                    "type": "integer"
+                },
+                "type": {
+                    "$ref": "#/definitions/config.GroupType"
+                }
+            }
+        },
+        "dto.Location": {
+            "type": "object",
+            "properties": {
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                }
+            }
+        },
         "dto.LoginUserRequest": {
             "type": "object",
             "properties": {
@@ -92,6 +342,41 @@ const docTemplate = `{
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.UpdateGroupRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "radius": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "secret": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "public",
+                        "protected",
+                        "private"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/config.GroupType"
+                        }
+                    ]
+                }
+            }
+        },
+        "dto.UserUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "location": {
+                    "$ref": "#/definitions/dto.Location"
                 }
             }
         }

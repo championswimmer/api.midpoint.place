@@ -41,5 +41,6 @@ func main() {
 		lo.Must0(lo.Must(appDb.DB()).Close())
 	}()
 
+	applogger.Info("Starting server...")
 	lo.Must0(server.Listen(fmt.Sprintf(":%s", config.Port)))
 }

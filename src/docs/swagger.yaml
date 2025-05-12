@@ -1,11 +1,75 @@
 basePath: /v1
 definitions:
+  config.GroupType:
+    enum:
+    - public
+    - protected
+    - private
+    type: string
+    x-enum-varnames:
+    - GroupTypePublic
+    - GroupTypeProtected
+    - GroupTypePrivate
+  dto.CreateGroupRequest:
+    properties:
+      name:
+        type: string
+      radius:
+        minimum: 0
+        type: integer
+      secret:
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/config.GroupType'
+        enum:
+        - public
+        - protected
+        - private
+    required:
+    - name
+    type: object
   dto.CreateUserRequest:
     properties:
       password:
         type: string
       username:
         type: string
+    type: object
+  dto.ErrorResponse:
+    properties:
+      message:
+        example: Something went wrong
+        type: string
+      status:
+        example: 400
+        type: integer
+    type: object
+  dto.GroupResponse:
+    properties:
+      code:
+        type: string
+      creator_id:
+        type: string
+      id:
+        type: string
+      midpoint_latitude:
+        type: number
+      midpoint_longitude:
+        type: number
+      name:
+        type: string
+      radius:
+        type: integer
+      type:
+        $ref: '#/definitions/config.GroupType'
+    type: object
+  dto.Location:
+    properties:
+      latitude:
+        type: number
+      longitude:
+        type: number
     type: object
   dto.LoginUserRequest:
     properties:
@@ -14,6 +78,28 @@ definitions:
       username:
         type: string
     type: object
+  dto.UpdateGroupRequest:
+    properties:
+      name:
+        type: string
+      radius:
+        minimum: 0
+        type: integer
+      secret:
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/config.GroupType'
+        enum:
+        - public
+        - protected
+        - private
+    type: object
+  dto.UserUpdateRequest:
+    properties:
+      location:
+        $ref: '#/definitions/dto.Location'
+    type: object
 host: api.midpoint.place
 info:
   contact: {}
@@ -21,6 +107,85 @@ info:
   title: Midpoint Place API
   version: "1.0"
 paths:
+  /groups:
+    post:
+      consumes:
+      - application/json
+      description: Create a new group
+      operationId: create-group
+      parameters:
+      - description: Group
+        in: body
+        name: group
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateGroupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.GroupResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Create a new group
+      tags:
+      - groups
+  /groups/{groupid}:
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing group's details
+      operationId: update-group
+      parameters:
+      - description: Group ID
+        in: path
+        name: groupid
+        required: true
+        type: string
+      - description: Group Update Data
+        in: body
+        name: group
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateGroupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GroupResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Update an existing group
+      tags:
+      - groups
   /users:
     post:
       consumes:
@@ -38,6 +203,30 @@ paths:
       - application/json
       responses: {}
       summary: Register a new user
+      tags:
+      - users
+  /users/{userid}:
+    post:
+      consumes:
+      - application/json
+      description: Update location details for a user
+      operationId: update-user-location
+      parameters:
+      - description: User ID
+        in: path
+        name: userid
+        required: true
+        type: string
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserUpdateRequest'
+      produces:
+      - application/json
+      responses: {}
+      summary: Update user location
       tags:
       - users
   /users/login:

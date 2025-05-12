@@ -16,10 +16,7 @@ import (
 
 func TestUsersRoute_LoginUser(t *testing.T) {
 	// First register a user
-	registerBody := []byte(`{"username": "testuser111", "password": "testpassword111"}`)
-	registerReq := httptest.NewRequest("POST", "/v1/users", bytes.NewBuffer(registerBody))
-	registerReq.Header.Set("Content-Type", "application/json")
-	lo.Must(tests.App.Test(registerReq, -1))
+	tests.TestUtil_CreateUser(t, "testuser111", "testpassword111")
 
 	// Test cases
 	testCases := []struct {

@@ -4,12 +4,15 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	"strconv"
 
 	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/db"
 	"github.com/championswimmer/api.midpoint.place/src/db/models"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
+	"github.com/championswimmer/api.midpoint.place/src/server/validators"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"gorm.io/gorm"
 )
@@ -46,7 +49,32 @@ func generateRandomSecret() string {
 	return fmt.Sprintf("%06d", n.Int64()+100000)
 }
 
+func (c *GroupsController) GetGroupByID(groupID string) (*dto.GroupResponse, error) {
+	var group models.Group
+	if err := uuid.Validate(groupID); err != nil {
+		return nil, fiber.NewError(fiber.StatusUnprocessableEntity, "Invalid group ID")
+	}
+	if err := c.db.Where("id = ?", groupID).First(&group).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
+	}
+	return &dto.GroupResponse{
+		ID:           group.ID,
+		Name:         group.Name,
+		Type:         group.Type,
+		Code:         group.Code,
+		CreatorID:    strconv.FormatUint(uint64(group.CreatorID), 10),
+		MidpointLat:  group.MidpointLatitude,
+		MidpointLong: group.MidpointLongitude,
+		Radius:       group.Radius,
+	}, nil
+}
+
 func (c *GroupsController) CreateGroup(creatorID uint, req *dto.CreateGroupRequest) (*dto.GroupResponse, error) {
+	// Validate request
+	if err := validators.ValidateCreateGroupRequest(req); err != nil {
+		return nil, err
+	}
+
 	// Generate random code and secret if not provided
 	code := generateGroupCode()
 
@@ -63,6 +91,7 @@ func (c *GroupsController) CreateGroup(creatorID uint, req *dto.CreateGroupReque
 
 	// Create new group
 	group := models.Group{
+		ID:        uuid.New().String(),
 		CreatorID: creatorID,
 		Name:      req.Name,
 		Type:      groupType,
@@ -80,7 +109,7 @@ func (c *GroupsController) CreateGroup(creatorID uint, req *dto.CreateGroupReque
 		Name:         group.Name,
 		Type:         group.Type,
 		Code:         group.Code,
-		CreatorID:    group.CreatorID,
+		CreatorID:    strconv.FormatUint(uint64(group.CreatorID), 10),
 		MidpointLat:  group.MidpointLatitude,
 		MidpointLong: group.MidpointLongitude,
 		Radius:       group.Radius,
@@ -116,7 +145,7 @@ func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupReque
 		Name:         group.Name,
 		Type:         group.Type,
 		Code:         group.Code,
-		CreatorID:    group.CreatorID,
+		CreatorID:    strconv.FormatUint(uint64(group.CreatorID), 10),
 		MidpointLat:  group.MidpointLatitude,
 		MidpointLong: group.MidpointLongitude,
 		Radius:       group.Radius,

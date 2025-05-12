@@ -26,6 +26,7 @@ func CreateServer() *fiber.App {
 	apiV1 := app.Group("/v1")
 
 	apiV1.Route("/users", routes.UsersRoute())
+	apiV1.Route("/groups", routes.GroupsRoute())
 
 	return app
 }

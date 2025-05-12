@@ -12,6 +12,7 @@ type GroupUser struct {
 	Group     Group   `gorm:"foreignKey:GroupID"`
 	Latitude  float64 `gorm:"type:decimal(10,8);not null"`
 	Longitude float64 `gorm:"type:decimal(11,8);not null"`
+	Role      string  `gorm:"type:varchar(50);not null;default:'member'"`
 }
 
 func (GroupUser) TableName() string {

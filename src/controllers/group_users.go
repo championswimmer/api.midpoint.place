@@ -23,26 +23,26 @@ func CreateGroupUsersController() *GroupUsersController {
 // JoinGroup adds a user to a group with specified location
 // This operation is idempotent - if the user is already in the group,
 // their location will be updated and a warning will be logged
-func (c *GroupUsersController) JoinGroup(req *dto.GroupUserJoinRequest) (*dto.GroupUserResponse, error) {
+func (c *GroupUsersController) JoinGroup(groupID string, userID uint, req *dto.GroupUserJoinRequest) (*dto.GroupUserResponse, error) {
 	// Check if user exists
 	var user models.User
-	if err := c.db.First(&user, req.UserID).Error; err != nil {
+	if err := c.db.First(&user, userID).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusNotFound, "User not found")
 	}
 
 	// Check if group exists
 	var group models.Group
-	if err := c.db.First(&group, "id = ?", req.GroupID).Error; err != nil {
+	if err := c.db.First(&group, "id = ?", groupID).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
 	}
 
 	// Check if the user is already in the group
 	var existingGroupUser models.GroupUser
-	result := c.db.Where("user_id = ? AND group_id = ?", req.UserID, req.GroupID).First(&existingGroupUser)
+	result := c.db.Where("user_id = ? AND group_id = ?", userID, groupID).First(&existingGroupUser)
 
 	if result.Error == nil {
 		// User is already in the group, update their location
-		applogger.Warn("User", req.UserID, "is already in group", req.GroupID, "- updating location")
+		applogger.Warn("User", userID, "is already in group", groupID, "- updating location")
 
 		existingGroupUser.Latitude = req.Latitude
 		existingGroupUser.Longitude = req.Longitude
@@ -61,8 +61,8 @@ func (c *GroupUsersController) JoinGroup(req *dto.GroupUserJoinRequest) (*dto.Gr
 
 	// Add user to group
 	groupUser := models.GroupUser{
-		UserID:    req.UserID,
-		GroupID:   req.GroupID,
+		UserID:    userID,
+		GroupID:   groupID,
 		Latitude:  req.Latitude,
 		Longitude: req.Longitude,
 	}
@@ -82,15 +82,15 @@ func (c *GroupUsersController) JoinGroup(req *dto.GroupUserJoinRequest) (*dto.Gr
 // LeaveGroup removes a user from a group
 // This operation is idempotent - if the user is not in the group,
 // a warning will be logged but no error will be returned
-func (c *GroupUsersController) LeaveGroup(req *dto.GroupUserLeaveRequest) error {
+func (c *GroupUsersController) LeaveGroup(groupID string, userID uint) error {
 	// Check if the mapping exists
 	var groupUser models.GroupUser
-	result := c.db.Where("user_id = ? AND group_id = ?", req.UserID, req.GroupID).First(&groupUser)
+	result := c.db.Where("user_id = ? AND group_id = ?", userID, groupID).First(&groupUser)
 
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
 			// User is not in the group, log a warning but don't return an error
-			applogger.Warn("User", req.UserID, "is not in group", req.GroupID, "- no action needed")
+			applogger.Warn("User", userID, "is not in group", groupID, "- no action needed")
 			return nil
 		}
 		// Return other errors

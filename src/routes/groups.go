@@ -12,13 +12,17 @@ import (
 )
 
 var groupsController *controllers.GroupsController
+var groupUsersController *controllers.GroupUsersController
 
 func GroupsRoute() func(router fiber.Router) {
 	groupsController = controllers.CreateGroupsController()
+	groupUsersController = controllers.CreateGroupUsersController()
 
 	return func(router fiber.Router) {
 		router.Post("/", security.MandatoryJwtAuthMiddleware, createGroup)
 		router.Patch("/:groupIdOrCode", security.MandatoryJwtAuthMiddleware, updateGroup) // Assuming PATCH for partial updates
+		router.Put("/:groupIdOrCode/join", security.MandatoryJwtAuthMiddleware, joinGroup)
+		router.Delete("/:groupIdOrCode/join", security.MandatoryJwtAuthMiddleware, leaveGroup)
 	}
 }
 
@@ -93,4 +97,64 @@ func updateGroup(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusAccepted).JSON(group)
+}
+
+// @Summary Join a group
+// @Description Join an existing group
+// @Tags groups
+// @ID join-group
+// @Produce json
+// @Param groupIdOrCode path string true "Group ID or Code"
+// @Success 200 {object} dto.GroupUserResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /groups/{groupIdOrCode}/join [put]
+func joinGroup(ctx *fiber.Ctx) error {
+	user := ctx.Locals(config.LOCALS_USER).(*models.User)
+	groupIDOrCode := ctx.Params("groupIdOrCode")
+
+	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode)
+	if err != nil {
+		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
+	}
+
+	groupUserReq, parseError := parsers.ParseBody[dto.GroupUserJoinRequest](ctx)
+	if parseError != nil {
+		return parsers.SendParsingError(ctx, parseError)
+	}
+
+	groupUserResp, err := groupUsersController.JoinGroup(group.ID, user.ID, groupUserReq)
+	if err != nil {
+		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(groupUserResp)
+}
+
+// @Summary Leave a group
+// @Description Leave an existing group
+// @Tags groups
+// @ID leave-group
+// @Produce json
+// @Param groupIdOrCode path string true "Group ID or Code"
+// @Success 200 {object} dto.GroupUserResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /groups/{groupIdOrCode}/join [delete]
+func leaveGroup(ctx *fiber.Ctx) error {
+	user := ctx.Locals(config.LOCALS_USER).(*models.User)
+	groupIDOrCode := ctx.Params("groupIdOrCode")
+
+	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode)
+	if err != nil {
+		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
+	}
+
+	err = groupUsersController.LeaveGroup(group.ID, user.ID)
+	if err != nil {
+		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
+	}
+	return ctx.Status(fiber.StatusAccepted).JSON([]byte("{}"))
 }

@@ -12,3 +12,8 @@ const (
 	GroupTypeProtected GroupType = "protected"
 	GroupTypePrivate   GroupType = "private"
 )
+
+const (
+	GroupRoleAdmin  = "admin"
+	GroupRoleMember = "member"
+)

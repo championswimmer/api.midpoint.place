@@ -10,3 +10,7 @@ type User struct {
 	Latitude  float64 `gorm:"type:decimal(10,8);not null;default:0"`
 	Longitude float64 `gorm:"type:decimal(11,8);not null;default:0"`
 }
+
+func (User) TableName() string {
+	return "users"
+}

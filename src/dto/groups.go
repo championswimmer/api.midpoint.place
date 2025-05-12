@@ -1,0 +1,28 @@
+package dto
+
+import "github.com/championswimmer/api.midpoint.place/src/config"
+
+type CreateGroupRequest struct {
+	Name   string           `json:"name" validate:"required"`
+	Type   config.GroupType `json:"type" validate:"omitempty,oneof=public protected private"`
+	Secret string           `json:"secret" validate:"omitempty"`
+	Radius float64          `json:"radius" validate:"omitempty,min=0"`
+}
+
+type UpdateGroupRequest struct {
+	Name   string           `json:"name" validate:"omitempty"`
+	Type   config.GroupType `json:"type" validate:"omitempty,oneof=public protected private"`
+	Secret string           `json:"secret" validate:"omitempty"`
+	Radius float64          `json:"radius" validate:"omitempty,min=0"`
+}
+
+type GroupResponse struct {
+	ID           string           `json:"id"`
+	Name         string           `json:"name"`
+	Type         config.GroupType `json:"type"`
+	Code         string           `json:"code"`
+	CreatorID    uint             `json:"creator_id"`
+	MidpointLat  float64          `json:"midpoint_latitude"`
+	MidpointLong float64          `json:"midpoint_longitude"`
+	Radius       float64          `json:"radius"`
+}

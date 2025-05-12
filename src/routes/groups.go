@@ -18,7 +18,7 @@ func GroupsRoute() func(router fiber.Router) {
 
 	return func(router fiber.Router) {
 		router.Post("/", security.MandatoryJwtAuthMiddleware, createGroup)
-		router.Patch("/:groupid", security.MandatoryJwtAuthMiddleware, updateGroup) // Assuming PATCH for partial updates
+		router.Patch("/:groupIdOrCode", security.MandatoryJwtAuthMiddleware, updateGroup) // Assuming PATCH for partial updates
 	}
 }
 
@@ -61,18 +61,18 @@ func createGroup(ctx *fiber.Ctx) error {
 // @ID update-group
 // @Accept json
 // @Produce json
-// @Param groupid path string true "Group ID"
+// @Param groupIdOrCode path string true "Group ID or Code"
 // @Param group body dto.UpdateGroupRequest true "Group Update Data"
 // @Success 200 {object} dto.GroupResponse
 // @Failure 400 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 422 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
-// @Router /groups/{groupid} [patch]
+// @Router /groups/{groupIdOrCode} [patch]
 func updateGroup(ctx *fiber.Ctx) error {
-	groupID := ctx.Params("groupid")
+	groupID := ctx.Params("groupIdOrCode")
 
-	group, err := groupsController.GetGroupByID(groupID)
+	group, err := groupsController.GetGroupByIDorCode(groupID)
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 	"strconv"
+	"strings"
 
 	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/db"
@@ -49,14 +50,35 @@ func generateRandomSecret() string {
 	return fmt.Sprintf("%06d", n.Int64()+100000)
 }
 
-func (c *GroupsController) GetGroupByID(groupID string) (*dto.GroupResponse, error) {
+func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string) (*dto.GroupResponse, error) {
 	var group models.Group
-	if err := uuid.Validate(groupID); err != nil {
-		return nil, fiber.NewError(fiber.StatusUnprocessableEntity, "Invalid group ID")
+
+	// Check if input is valid UUID or 10-char alphanumeric code
+	isValidUUID := uuid.Validate(groupIDorCode) == nil
+	isValidCode := len(groupIDorCode) == 10 && func() bool {
+		for _, c := range groupIDorCode {
+			if !strings.ContainsRune(config.GROUP_CODE_CHARSET, c) {
+				return false
+			}
+		}
+		return true
+	}()
+
+	if !isValidUUID && !isValidCode {
+		return nil, fiber.NewError(fiber.StatusUnprocessableEntity, "Invalid group ID or code")
 	}
-	if err := c.db.Where("id = ?", groupID).First(&group).Error; err != nil {
+
+	query := c.db
+	if isValidUUID {
+		query = query.Where("id = ?", groupIDorCode)
+	} else {
+		query = query.Where("code = ?", groupIDorCode)
+	}
+
+	if err := query.First(&group).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
 	}
+
 	return &dto.GroupResponse{
 		ID:           group.ID,
 		Name:         group.Name,

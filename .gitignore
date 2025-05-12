@@ -40,3 +40,6 @@ go.work.sum
 
 # Databases 
 app.db
+
+# Binary 
+/bin/*

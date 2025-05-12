@@ -14,6 +14,9 @@ import (
 // @host api.midpoint.place
 // @BasePath /v1
 // @schemes http https
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func CreateServer() *fiber.App {
 	app := fiber.New(fiber.Config{
 		// Prefork: true,

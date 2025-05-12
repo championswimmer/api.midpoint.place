@@ -1,0 +1,19 @@
+{
+  "build": {
+    "builder": "DOCKERFILE",
+    "watchPatterns": [
+      "Dockerfile",
+      "go.mod",
+      "go.sum",
+      "src/**",
+      ".env.*",
+      "/railway.json"
+    ]
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "restartPolicyType": "ALWAYS",
+    "restartPolicyMaxRetries": 5,
+    "sleepApplication": false
+  }
+}

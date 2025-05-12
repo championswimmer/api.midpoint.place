@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/groups": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new group",
                 "consumes": [
                     "application/json"
@@ -70,6 +75,11 @@ const docTemplate = `{
         },
         "/groups/{groupIdOrCode}": {
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update an existing group's details",
                 "consumes": [
                     "application/json"
@@ -136,6 +146,11 @@ const docTemplate = `{
         },
         "/groups/{groupIdOrCode}/join": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Join an existing group",
                 "produces": [
                     "application/json"
@@ -191,6 +206,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Leave an existing group",
                 "produces": [
                     "application/json"
@@ -295,6 +315,11 @@ const docTemplate = `{
         },
         "/users/{userid}": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update location details for a user",
                 "consumes": [
                     "application/json"
@@ -439,6 +464,10 @@ const docTemplate = `{
         },
         "dto.GroupUserJoinRequest": {
             "type": "object",
+            "required": [
+                "latitude",
+                "longitude"
+            ],
             "properties": {
                 "latitude": {
                     "type": "number"
@@ -464,12 +493,16 @@ const docTemplate = `{
                     "$ref": "#/definitions/config.GroupUserRole"
                 },
                 "user_id": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
         "dto.Location": {
             "type": "object",
+            "required": [
+                "latitude",
+                "longitude"
+            ],
             "properties": {
                 "latitude": {
                     "type": "number"
@@ -524,6 +557,13 @@ const docTemplate = `{
                     "$ref": "#/definitions/dto.Location"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

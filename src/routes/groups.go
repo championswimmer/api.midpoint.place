@@ -39,6 +39,7 @@ func GroupsRoute() func(router fiber.Router) {
 // @Failure 422 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /groups [post]
+// @Security BearerAuth
 func createGroup(ctx *fiber.Ctx) error {
 	user := ctx.Locals(config.LOCALS_USER).(*models.User)
 
@@ -74,6 +75,7 @@ func createGroup(ctx *fiber.Ctx) error {
 // @Failure 422 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /groups/{groupIdOrCode} [patch]
+// @Security BearerAuth
 func updateGroup(ctx *fiber.Ctx) error {
 	groupID := ctx.Params("groupIdOrCode")
 
@@ -112,6 +114,7 @@ func updateGroup(ctx *fiber.Ctx) error {
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /groups/{groupIdOrCode}/join [put]
+// @Security BearerAuth
 func joinGroup(ctx *fiber.Ctx) error {
 	user := ctx.Locals(config.LOCALS_USER).(*models.User)
 	groupIDOrCode := ctx.Params("groupIdOrCode")
@@ -152,6 +155,7 @@ func joinGroup(ctx *fiber.Ctx) error {
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /groups/{groupIdOrCode}/join [delete]
+// @Security BearerAuth
 func leaveGroup(ctx *fiber.Ctx) error {
 	user := ctx.Locals(config.LOCALS_USER).(*models.User)
 	groupIDOrCode := ctx.Params("groupIdOrCode")

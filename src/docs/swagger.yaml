@@ -78,6 +78,9 @@ definitions:
         type: number
       longitude:
         type: number
+    required:
+    - latitude
+    - longitude
     type: object
   dto.GroupUserResponse:
     properties:
@@ -90,7 +93,7 @@ definitions:
       role:
         $ref: '#/definitions/config.GroupUserRole'
       user_id:
-        type: integer
+        type: string
     type: object
   dto.Location:
     properties:
@@ -98,6 +101,9 @@ definitions:
         type: number
       longitude:
         type: number
+    required:
+    - latitude
+    - longitude
     type: object
   dto.LoginUserRequest:
     properties:
@@ -167,6 +173,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Create a new group
       tags:
       - groups
@@ -211,6 +219,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Update an existing group
       tags:
       - groups
@@ -243,6 +253,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Leave a group
       tags:
       - groups
@@ -280,6 +292,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Join a group
       tags:
       - groups
@@ -323,6 +337,8 @@ paths:
       produces:
       - application/json
       responses: {}
+      security:
+      - BearerAuth: []
       summary: Update user location
       tags:
       - users
@@ -348,4 +364,9 @@ paths:
 schemes:
 - http
 - https
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

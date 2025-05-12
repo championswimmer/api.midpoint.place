@@ -3,8 +3,11 @@ package routes
 import (
 	"strconv"
 
+	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/controllers"
+	"github.com/championswimmer/api.midpoint.place/src/db/models"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
+	"github.com/championswimmer/api.midpoint.place/src/security"
 	"github.com/championswimmer/api.midpoint.place/src/server/parsers"
 	"github.com/championswimmer/api.midpoint.place/src/server/validators"
 	"github.com/gofiber/fiber/v2"
@@ -19,7 +22,7 @@ func UsersRoute() func(router fiber.Router) {
 	return func(router fiber.Router) {
 		router.Post("/", registerUser)
 		router.Post("/login", loginUser)
-		router.Post("/:userid", updateUserData)
+		router.Post("/:userid", security.MandatoryJwtAuthMiddleware, updateUserData)
 	}
 
 }
@@ -31,6 +34,9 @@ func UsersRoute() func(router fiber.Router) {
 // @Accept json
 // @Produce json
 // @Param user body dto.CreateUserRequest true "User"
+// @Success 201 {object} dto.UserResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 409 {object} dto.ErrorResponse
 // @Router /users [post]
 func registerUser(ctx *fiber.Ctx) error {
 	u, parseError := parsers.ParseBody[dto.CreateUserRequest](ctx)
@@ -48,8 +54,6 @@ func registerUser(ctx *fiber.Ctx) error {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
 
-	// TODO: Generate JWT token here when implementing authentication
-	// TODO: Do not return password hash
 	return ctx.Status(fiber.StatusCreated).JSON(user)
 }
 
@@ -89,10 +93,15 @@ func loginUser(ctx *fiber.Ctx) error {
 // @Param userid path string true "User ID"
 // @Param user body dto.UserUpdateRequest true "User"
 // @Router /users/{userid} [post]
+// @Security BearerAuth
 func updateUserData(ctx *fiber.Ctx) error {
 	userID, err := strconv.ParseUint(ctx.Params("userid"), 10, 32)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.CreateErrorResponse(fiber.StatusBadRequest, "Invalid user ID"))
+	}
+	// allow only for self
+	if userID != uint64(ctx.Locals(config.LOCALS_USER).(*models.User).ID) {
+		return ctx.Status(fiber.StatusForbidden).JSON(dto.CreateErrorResponse(fiber.StatusForbidden, "You are not allowed to update this user's data"))
 	}
 
 	req, parseError := parsers.ParseBody[dto.UserUpdateRequest](ctx)

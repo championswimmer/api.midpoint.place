@@ -15,6 +15,11 @@
     "paths": {
         "/groups": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new group",
                 "consumes": [
                     "application/json"
@@ -68,6 +73,11 @@
         },
         "/groups/{groupIdOrCode}": {
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update an existing group's details",
                 "consumes": [
                     "application/json"
@@ -134,6 +144,11 @@
         },
         "/groups/{groupIdOrCode}/join": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Join an existing group",
                 "produces": [
                     "application/json"
@@ -189,6 +204,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Leave an existing group",
                 "produces": [
                     "application/json"
@@ -293,6 +313,11 @@
         },
         "/users/{userid}": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update location details for a user",
                 "consumes": [
                     "application/json"
@@ -437,6 +462,10 @@
         },
         "dto.GroupUserJoinRequest": {
             "type": "object",
+            "required": [
+                "latitude",
+                "longitude"
+            ],
             "properties": {
                 "latitude": {
                     "type": "number"
@@ -462,12 +491,16 @@
                     "$ref": "#/definitions/config.GroupUserRole"
                 },
                 "user_id": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
         "dto.Location": {
             "type": "object",
+            "required": [
+                "latitude",
+                "longitude"
+            ],
             "properties": {
                 "latitude": {
                     "type": "number"
@@ -522,6 +555,13 @@
                     "$ref": "#/definitions/dto.Location"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

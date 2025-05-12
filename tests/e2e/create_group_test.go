@@ -18,6 +18,7 @@ import (
 func TestGroupsRoute_CreateGroup(t *testing.T) {
 	// First register a user
 	createdUser := tests.TestUtil_CreateUser(t, "testuser222", "testpassword222")
+	var createdGroup dto.GroupResponse
 
 	testcases := []struct {
 		name           string
@@ -41,6 +42,7 @@ func TestGroupsRoute_CreateGroup(t *testing.T) {
 				assert.Equal(t, config.GroupTypePublic, groupResp.Type)
 				assert.Equal(t, 1200, groupResp.Radius)
 				assert.Equal(t, createdUser.Id, groupResp.CreatorID)
+				createdGroup = groupResp
 			},
 		},
 		{
@@ -73,4 +75,14 @@ func TestGroupsRoute_CreateGroup(t *testing.T) {
 			tc.checkResponse(t, body)
 		})
 	}
+
+	// Get the group
+	t.Run("get group", func(t *testing.T) {
+		req := httptest.NewRequest("GET", "/v1/groups/"+createdGroup.ID, nil)
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+createdUser.Token)
+
+		resp := lo.Must(tests.App.Test(req, -1))
+		assert.Equal(t, fiber.StatusOK, resp.StatusCode)
+	})
 }

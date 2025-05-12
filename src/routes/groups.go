@@ -21,6 +21,7 @@ func GroupsRoute() func(router fiber.Router) {
 
 	return func(router fiber.Router) {
 		router.Post("/", security.MandatoryJwtAuthMiddleware, createGroup)
+		router.Get("/:groupIdOrCode", security.MandatoryJwtAuthMiddleware, getGroup)
 		router.Patch("/:groupIdOrCode", security.MandatoryJwtAuthMiddleware, updateGroup) // Assuming PATCH for partial updates
 		router.Put("/:groupIdOrCode/join", security.MandatoryJwtAuthMiddleware, joinGroup)
 		router.Delete("/:groupIdOrCode/join", security.MandatoryJwtAuthMiddleware, leaveGroup)
@@ -170,6 +171,29 @@ func leaveGroup(ctx *fiber.Ctx) error {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
 	return ctx.Status(fiber.StatusAccepted).JSON([]byte("{}"))
+}
+
+// @Summary Get group information
+// @Description Get details of a group by ID or code
+// @Tags groups
+// @ID get-group
+// @Produce json
+// @Param groupIdOrCode path string true "Group ID or Code"
+// @Success 200 {object} dto.GroupResponse
+// @Failure 400 {object} dto.ErrorResponse
+// @Failure 404 {object} dto.ErrorResponse
+// @Failure 500 {object} dto.ErrorResponse
+// @Router /groups/{groupIdOrCode} [get]
+// @Security BearerAuth
+func getGroup(ctx *fiber.Ctx) error {
+	groupIDOrCode := ctx.Params("groupIdOrCode")
+
+	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode)
+	if err != nil {
+		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(group)
 }
 
 func _recalculateGroupMidpoint(groupID string) error {

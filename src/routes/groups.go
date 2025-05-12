@@ -8,6 +8,7 @@ import (
 	"github.com/championswimmer/api.midpoint.place/src/security"
 	"github.com/championswimmer/api.midpoint.place/src/server/parsers"
 	"github.com/championswimmer/api.midpoint.place/src/server/validators"
+	"github.com/championswimmer/api.midpoint.place/src/utils/applogger"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -105,6 +106,7 @@ func updateGroup(ctx *fiber.Ctx) error {
 // @ID join-group
 // @Produce json
 // @Param groupIdOrCode path string true "Group ID or Code"
+// @Param groupUser body dto.GroupUserJoinRequest true "Group User"
 // @Success 200 {object} dto.GroupUserResponse
 // @Failure 400 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
@@ -128,6 +130,13 @@ func joinGroup(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
+
+	go func() {
+		err := _recalculateGroupMidpoint(group.ID)
+		if err != nil {
+			applogger.Error("Error recalculating group location", err)
+		}
+	}()
 
 	return ctx.Status(fiber.StatusOK).JSON(groupUserResp)
 }
@@ -157,4 +166,24 @@ func leaveGroup(ctx *fiber.Ctx) error {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
 	return ctx.Status(fiber.StatusAccepted).JSON([]byte("{}"))
+}
+
+func _recalculateGroupMidpoint(groupID string) error {
+	applogger.Info("Recalculating group midpoint for group", groupID)
+	centroidLatitude, centroidLongitude, err := groupUsersController.CalculateGroupCentroid(groupID)
+	if err != nil {
+		return err
+	}
+	applogger.Info("Recalculated group midpoint for group", groupID, "to", centroidLatitude, centroidLongitude)
+
+	groupMidpointUpdateRequest := &dto.UpdateGroupMidpointRequest{}
+	groupMidpointUpdateRequest.Latitude = centroidLatitude
+	groupMidpointUpdateRequest.Longitude = centroidLongitude
+
+	_, err = groupsController.UpdateGroupMidpoint(groupID, groupMidpointUpdateRequest)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

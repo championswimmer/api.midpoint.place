@@ -13,7 +13,9 @@ const (
 	GroupTypePrivate   GroupType = "private"
 )
 
+type GroupUserRole string
+
 const (
-	GroupRoleAdmin  = "admin"
-	GroupRoleMember = "member"
+	GroupUserAdmin  GroupUserRole = "admin"
+	GroupUserMember GroupUserRole = "member"
 )

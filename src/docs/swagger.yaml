@@ -64,6 +64,19 @@ definitions:
       type:
         $ref: '#/definitions/config.GroupType'
     type: object
+  dto.GroupUserResponse:
+    properties:
+      group_id:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      role:
+        type: string
+      user_id:
+        type: integer
+    type: object
   dto.Location:
     properties:
       latitude:
@@ -142,16 +155,16 @@ paths:
       summary: Create a new group
       tags:
       - groups
-  /groups/{groupid}:
+  /groups/{groupIdOrCode}:
     patch:
       consumes:
       - application/json
       description: Update an existing group's details
       operationId: update-group
       parameters:
-      - description: Group ID
+      - description: Group ID or Code
         in: path
-        name: groupid
+        name: groupIdOrCode
         required: true
         type: string
       - description: Group Update Data
@@ -184,6 +197,69 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Update an existing group
+      tags:
+      - groups
+  /groups/{groupIdOrCode}/join:
+    delete:
+      description: Leave an existing group
+      operationId: leave-group
+      parameters:
+      - description: Group ID or Code
+        in: path
+        name: groupIdOrCode
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GroupUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Leave a group
+      tags:
+      - groups
+    put:
+      description: Join an existing group
+      operationId: join-group
+      parameters:
+      - description: Group ID or Code
+        in: path
+        name: groupIdOrCode
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GroupUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Join a group
       tags:
       - groups
   /users:

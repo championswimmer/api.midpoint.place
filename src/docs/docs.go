@@ -68,7 +68,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/groups/{groupid}": {
+        "/groups/{groupIdOrCode}": {
             "patch": {
                 "description": "Update an existing group's details",
                 "consumes": [
@@ -85,8 +85,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Group ID",
-                        "name": "groupid",
+                        "description": "Group ID or Code",
+                        "name": "groupIdOrCode",
                         "in": "path",
                         "required": true
                     },
@@ -121,6 +121,100 @@ const docTemplate = `{
                     },
                     "422": {
                         "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/groups/{groupIdOrCode}/join": {
+            "put": {
+                "description": "Join an existing group",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groups"
+                ],
+                "summary": "Join a group",
+                "operationId": "join-group",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Group ID or Code",
+                        "name": "groupIdOrCode",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GroupUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Leave an existing group",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groups"
+                ],
+                "summary": "Leave a group",
+                "operationId": "leave-group",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Group ID or Code",
+                        "name": "groupIdOrCode",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GroupUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -320,6 +414,26 @@ const docTemplate = `{
                 },
                 "type": {
                     "$ref": "#/definitions/config.GroupType"
+                }
+            }
+        },
+        "dto.GroupUserResponse": {
+            "type": "object",
+            "properties": {
+                "group_id": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },

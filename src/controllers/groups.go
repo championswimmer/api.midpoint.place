@@ -173,3 +173,27 @@ func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupReque
 		Radius:       group.Radius,
 	}, nil
 }
+
+func (c *GroupsController) UpdateGroupMidpoint(groupID string, req *dto.UpdateGroupMidpointRequest) (*dto.GroupResponse, error) {
+	var group models.Group
+	if err := c.db.Where("id = ?", groupID).First(&group).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
+	}
+
+	group.MidpointLatitude = req.Latitude
+	group.MidpointLongitude = req.Longitude
+
+	if err := c.db.Save(&group).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to update group location")
+	}
+	return &dto.GroupResponse{
+		ID:           group.ID,
+		Name:         group.Name,
+		Type:         group.Type,
+		Code:         group.Code,
+		CreatorID:    strconv.FormatUint(uint64(group.CreatorID), 10),
+		MidpointLat:  group.MidpointLatitude,
+		MidpointLong: group.MidpointLongitude,
+		Radius:       group.Radius,
+	}, nil
+}

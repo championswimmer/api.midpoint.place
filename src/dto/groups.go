@@ -16,6 +16,10 @@ type UpdateGroupRequest struct {
 	Radius int              `json:"radius" validate:"omitempty,min=0"`
 }
 
+type UpdateGroupMidpointRequest struct {
+	Location
+}
+
 type GroupResponse struct {
 	ID           string           `json:"id"`
 	Name         string           `json:"name"`

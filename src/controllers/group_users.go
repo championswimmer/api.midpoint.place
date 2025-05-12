@@ -104,3 +104,25 @@ func (c *GroupUsersController) LeaveGroup(groupID string, userID uint) error {
 
 	return nil
 }
+
+func (c *GroupUsersController) CalculateGroupCentroid(groupID string) (latitude float64, longitude float64, err error) {
+	groupMembers := []models.GroupUser{}
+
+	if err := c.db.Where("group_id = ?", groupID).Find(&groupMembers).Error; err != nil {
+		return 0, 0, fiber.NewError(fiber.StatusInternalServerError, "Failed to get group members")
+	}
+
+	totalMembers := len(groupMembers)
+	totalLatitude := 0.0
+	totalLongitude := 0.0
+
+	for _, member := range groupMembers {
+		totalLatitude += member.Latitude
+		totalLongitude += member.Longitude
+	}
+
+	centroidLatitude := totalLatitude / float64(totalMembers)
+	centroidLongitude := totalLongitude / float64(totalMembers)
+
+	return centroidLatitude, centroidLongitude, nil
+}

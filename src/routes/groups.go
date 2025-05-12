@@ -138,7 +138,7 @@ func joinGroup(ctx *fiber.Ctx) error {
 		}
 	}()
 
-	return ctx.Status(fiber.StatusOK).JSON(groupUserResp)
+	return ctx.Status(fiber.StatusAccepted).JSON(groupUserResp)
 }
 
 // @Summary Leave a group

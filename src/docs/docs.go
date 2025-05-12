@@ -152,6 +152,15 @@ const docTemplate = `{
                         "name": "groupIdOrCode",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Group User",
+                        "name": "groupUser",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GroupUserJoinRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -334,6 +343,17 @@ const docTemplate = `{
                 "GroupTypePrivate"
             ]
         },
+        "config.GroupUserRole": {
+            "type": "string",
+            "enum": [
+                "admin",
+                "member"
+            ],
+            "x-enum-varnames": [
+                "GroupUserAdmin",
+                "GroupUserMember"
+            ]
+        },
         "dto.CreateGroupRequest": {
             "type": "object",
             "required": [
@@ -417,6 +437,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.GroupUserJoinRequest": {
+            "type": "object",
+            "properties": {
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                }
+            }
+        },
         "dto.GroupUserResponse": {
             "type": "object",
             "properties": {
@@ -430,7 +461,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "role": {
-                    "type": "string"
+                    "$ref": "#/definitions/config.GroupUserRole"
                 },
                 "user_id": {
                     "type": "integer"

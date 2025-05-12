@@ -10,6 +10,14 @@ definitions:
     - GroupTypePublic
     - GroupTypeProtected
     - GroupTypePrivate
+  config.GroupUserRole:
+    enum:
+    - admin
+    - member
+    type: string
+    x-enum-varnames:
+    - GroupUserAdmin
+    - GroupUserMember
   dto.CreateGroupRequest:
     properties:
       name:
@@ -64,6 +72,13 @@ definitions:
       type:
         $ref: '#/definitions/config.GroupType'
     type: object
+  dto.GroupUserJoinRequest:
+    properties:
+      latitude:
+        type: number
+      longitude:
+        type: number
+    type: object
   dto.GroupUserResponse:
     properties:
       group_id:
@@ -73,7 +88,7 @@ definitions:
       longitude:
         type: number
       role:
-        type: string
+        $ref: '#/definitions/config.GroupUserRole'
       user_id:
         type: integer
     type: object
@@ -240,6 +255,12 @@ paths:
         name: groupIdOrCode
         required: true
         type: string
+      - description: Group User
+        in: body
+        name: groupUser
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GroupUserJoinRequest'
       produces:
       - application/json
       responses:

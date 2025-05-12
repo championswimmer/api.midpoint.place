@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"strconv"
+
 	"github.com/championswimmer/api.midpoint.place/src/db"
 	"github.com/championswimmer/api.midpoint.place/src/db/models"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
@@ -52,7 +54,7 @@ func (c *GroupUsersController) JoinGroup(groupID string, userID uint, req *dto.G
 		}
 
 		return &dto.GroupUserResponse{
-			UserID:    existingGroupUser.UserID,
+			UserID:    strconv.Itoa(int(existingGroupUser.UserID)),
 			GroupID:   existingGroupUser.GroupID,
 			Latitude:  existingGroupUser.Latitude,
 			Longitude: existingGroupUser.Longitude,
@@ -72,7 +74,7 @@ func (c *GroupUsersController) JoinGroup(groupID string, userID uint, req *dto.G
 	}
 
 	return &dto.GroupUserResponse{
-		UserID:    groupUser.UserID,
+		UserID:    strconv.Itoa(int(groupUser.UserID)),
 		GroupID:   groupUser.GroupID,
 		Latitude:  groupUser.Latitude,
 		Longitude: groupUser.Longitude,

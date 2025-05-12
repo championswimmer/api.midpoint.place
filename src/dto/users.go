@@ -8,8 +8,8 @@ type CreateUserRequest struct {
 type LoginUserRequest = CreateUserRequest
 
 type Location struct {
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
+	Latitude  float64 `json:"latitude" validate:"required"`
+	Longitude float64 `json:"longitude" validate:"required"`
 }
 
 type UserUpdateRequest struct {

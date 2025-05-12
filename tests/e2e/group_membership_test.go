@@ -61,9 +61,12 @@ func TestGroupsRoute_MembershipOperations(t *testing.T) {
 		checkResponse  func(t *testing.T, body []byte)
 	}{
 		{
-			name:           "join group with group id",
-			groupID:        group1.ID,
-			requestBody:    []byte(`{}`), //FIXME: handle body properly (it fails test for now)
+			name:    "join group with group id",
+			groupID: group1.ID,
+			requestBody: []byte(`{
+				"latitude": 12.971645,
+				"longitude": 77.594562
+			}`),
 			method:         "PUT",
 			expectedStatus: fiber.StatusAccepted,
 			checkResponse: func(t *testing.T, body []byte) {
@@ -75,9 +78,12 @@ func TestGroupsRoute_MembershipOperations(t *testing.T) {
 			},
 		},
 		{
-			name:           "join group with group code",
-			groupID:        group2.Code,
-			requestBody:    []byte(`{}`), //FIXME: handle body properly (it fails test for now)
+			name:    "join group with group code",
+			groupID: group2.Code,
+			requestBody: []byte(`{
+				"latitude": 12.971645,
+				"longitude": 77.594562
+			}`),
 			method:         "PUT",
 			expectedStatus: fiber.StatusAccepted,
 			checkResponse: func(t *testing.T, body []byte) {
@@ -86,6 +92,16 @@ func TestGroupsRoute_MembershipOperations(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, group2.ID, groupUserResp.GroupID)
 				assert.Equal(t, user2.Id, groupUserResp.UserID)
+			},
+		},
+		{
+			name:           "leave group with group id",
+			groupID:        group1.ID,
+			requestBody:    []byte(``),
+			method:         "DELETE",
+			expectedStatus: fiber.StatusAccepted,
+			checkResponse: func(t *testing.T, body []byte) {
+
 			},
 		},
 	}

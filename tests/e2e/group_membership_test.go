@@ -79,8 +79,8 @@ func TestGroupsRoute_MembershipOperations(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			// sleep for 100ms
-			time.Sleep(100 * time.Millisecond)
+			// sleep for 20ms
+			time.Sleep(20 * time.Millisecond)
 			req := httptest.NewRequest(tc.method, "/v1/groups/"+tc.groupID+"/join", bytes.NewBuffer(tc.requestBody))
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", "Bearer "+user2.Token)

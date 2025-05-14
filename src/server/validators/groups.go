@@ -31,10 +31,12 @@ func validateSecret(secret string) *ValidationError {
 }
 
 func validateRadius(radius int) *ValidationError {
-	// float64 will always be a number, an invalid number will fail during parsing.
-	// However, we can add a check for a sensible range if needed, e.g., non-negative.
-	// For now, just ensuring it's a number is covered by type assertion/parsing.
-	// We already have a min=0 in the DTO validation tag.
+	if radius < 0 {
+		return &ValidationError{
+			status:  fiber.StatusUnprocessableEntity,
+			message: "Radius must be a positive integer",
+		}
+	}
 	return nil
 }
 

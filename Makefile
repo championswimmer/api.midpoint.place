@@ -42,8 +42,6 @@ build_all: $(BUILDDEPS)
 	@GOOS=windows GOARCH=amd64 go build -o "bin/$(BINARY_NAME)-windows-amd64.exe" src/main.go
 
 test_clean:
-	@echo "Cleaning test databases..."
-	@rm -f app.db
 	@echo "Cleaning test results..."
 	@rm -f coverage.unit.out
 	@rm -f coverage.e2e.out

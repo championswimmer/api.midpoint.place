@@ -21,12 +21,12 @@ type UpdateGroupMidpointRequest struct {
 }
 
 type GroupResponse struct {
-	ID           string           `json:"id"`
-	Name         string           `json:"name"`
-	Type         config.GroupType `json:"type"`
-	Code         string           `json:"code"`
-	CreatorID    string           `json:"creator_id"`
-	MidpointLat  float64          `json:"midpoint_latitude"`
-	MidpointLong float64          `json:"midpoint_longitude"`
-	Radius       int              `json:"radius"`
+	ID                string           `json:"id"`
+	Name              string           `json:"name"`
+	Type              config.GroupType `json:"type"`
+	Code              string           `json:"code"`
+	CreatorID         string           `json:"creator_id"`
+	MidpointLatitude  float64          `json:"midpoint_latitude"`
+	MidpointLongitude float64          `json:"midpoint_longitude"`
+	Radius            int              `json:"radius"`
 }

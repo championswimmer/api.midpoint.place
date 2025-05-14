@@ -1,0 +1,97 @@
+package e2e
+
+import (
+	"bytes"
+	"encoding/json"
+	"io"
+	"net/http/httptest"
+	"testing"
+	"time"
+
+	"github.com/championswimmer/api.midpoint.place/src/dto"
+	"github.com/championswimmer/api.midpoint.place/tests"
+	"github.com/gofiber/fiber/v2"
+	"github.com/samber/lo"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestGroupMidpointUpdate(t *testing.T) {
+	user1 := tests.TestUtil_CreateUser(t, "testuser1101", "testpassword1101")
+	user2 := tests.TestUtil_CreateUser(t, "testuser2101", "testpassword2101")
+
+	group1 := tests.TestUtil_CreateGroup(t, user1.Token, "Test Group 1101")
+
+	testcases := []struct {
+		name           string
+		groupID        string
+		userToken      string
+		requestBody    *dto.GroupUserJoinRequest
+		expectedStatus int
+		checkResponse  func(t *testing.T, body []byte)
+	}{
+		{
+			name:      "successful user1 joins group1",
+			groupID:   group1.ID,
+			userToken: user1.Token,
+			requestBody: &dto.GroupUserJoinRequest{
+				Location: dto.Location{
+					Latitude:  10.000000,
+					Longitude: 80.000000,
+				},
+			},
+			expectedStatus: fiber.StatusAccepted,
+			checkResponse: func(t *testing.T, body []byte) {
+				var response dto.GroupResponse
+				err := json.Unmarshal(body, &response)
+				assert.NoError(t, err)
+				assert.Equal(t, group1.ID, response.ID)
+				assert.Equal(t, 10.000000, response.MidpointLatitude)
+				assert.Equal(t, 80.000000, response.MidpointLongitude)
+			},
+		},
+		{
+			name:      "successful user2 joins group1",
+			groupID:   group1.ID,
+			userToken: user2.Token,
+			requestBody: &dto.GroupUserJoinRequest{
+				Location: dto.Location{
+					Latitude:  20.000000,
+					Longitude: 100.000000,
+				},
+			},
+			expectedStatus: fiber.StatusAccepted,
+			checkResponse: func(t *testing.T, body []byte) {
+				var response dto.GroupResponse
+				err := json.Unmarshal(body, &response)
+				assert.NoError(t, err)
+				assert.Equal(t, group1.ID, response.ID)
+				assert.Equal(t, 15.000000, response.MidpointLatitude)
+				assert.Equal(t, 90.000000, response.MidpointLongitude)
+			},
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			jsonBody, err := json.Marshal(tc.requestBody)
+			assert.NoError(t, err)
+			req := httptest.NewRequest(fiber.MethodPut, "/v1/groups/"+tc.groupID+"/join", bytes.NewBuffer(jsonBody))
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+tc.userToken)
+			resp := lo.Must(tests.App.Test(req, -1))
+			assert.Equal(t, tc.expectedStatus, resp.StatusCode)
+
+			// sleep for 20ms
+			time.Sleep(20 * time.Millisecond)
+
+			// fetch group details to check new midpoint
+
+			req = httptest.NewRequest(fiber.MethodGet, "/v1/groups/"+tc.groupID, nil)
+			req.Header.Set("Authorization", "Bearer "+tc.userToken)
+			resp = lo.Must(tests.App.Test(req, -1))
+			assert.Equal(t, fiber.StatusOK, resp.StatusCode)
+			body := lo.Must(io.ReadAll(resp.Body))
+			tc.checkResponse(t, body)
+		})
+	}
+}

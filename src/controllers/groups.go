@@ -80,14 +80,14 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string) (*dto.GroupR
 	}
 
 	return &dto.GroupResponse{
-		ID:           group.ID,
-		Name:         group.Name,
-		Type:         group.Type,
-		Code:         group.Code,
-		CreatorID:    strconv.FormatUint(uint64(group.CreatorID), 10),
-		MidpointLat:  group.MidpointLatitude,
-		MidpointLong: group.MidpointLongitude,
-		Radius:       group.Radius,
+		ID:                group.ID,
+		Name:              group.Name,
+		Type:              group.Type,
+		Code:              group.Code,
+		CreatorID:         strconv.FormatUint(uint64(group.CreatorID), 10),
+		MidpointLatitude:  group.MidpointLatitude,
+		MidpointLongitude: group.MidpointLongitude,
+		Radius:            group.Radius,
 	}, nil
 }
 
@@ -127,14 +127,14 @@ func (c *GroupsController) CreateGroup(creatorID uint, req *dto.CreateGroupReque
 	}
 
 	return &dto.GroupResponse{
-		ID:           group.ID,
-		Name:         group.Name,
-		Type:         group.Type,
-		Code:         group.Code,
-		CreatorID:    strconv.FormatUint(uint64(group.CreatorID), 10),
-		MidpointLat:  group.MidpointLatitude,
-		MidpointLong: group.MidpointLongitude,
-		Radius:       group.Radius,
+		ID:                group.ID,
+		Name:              group.Name,
+		Type:              group.Type,
+		Code:              group.Code,
+		CreatorID:         strconv.FormatUint(uint64(group.CreatorID), 10),
+		MidpointLatitude:  group.MidpointLatitude,
+		MidpointLongitude: group.MidpointLongitude,
+		Radius:            group.Radius,
 	}, nil
 }
 
@@ -163,14 +163,14 @@ func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupReque
 	}
 
 	return &dto.GroupResponse{
-		ID:           group.ID,
-		Name:         group.Name,
-		Type:         group.Type,
-		Code:         group.Code,
-		CreatorID:    strconv.FormatUint(uint64(group.CreatorID), 10),
-		MidpointLat:  group.MidpointLatitude,
-		MidpointLong: group.MidpointLongitude,
-		Radius:       group.Radius,
+		ID:                group.ID,
+		Name:              group.Name,
+		Type:              group.Type,
+		Code:              group.Code,
+		CreatorID:         strconv.FormatUint(uint64(group.CreatorID), 10),
+		MidpointLatitude:  group.MidpointLatitude,
+		MidpointLongitude: group.MidpointLongitude,
+		Radius:            group.Radius,
 	}, nil
 }
 
@@ -187,13 +187,13 @@ func (c *GroupsController) UpdateGroupMidpoint(groupID string, req *dto.UpdateGr
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to update group location")
 	}
 	return &dto.GroupResponse{
-		ID:           group.ID,
-		Name:         group.Name,
-		Type:         group.Type,
-		Code:         group.Code,
-		CreatorID:    strconv.FormatUint(uint64(group.CreatorID), 10),
-		MidpointLat:  group.MidpointLatitude,
-		MidpointLong: group.MidpointLongitude,
-		Radius:       group.Radius,
+		ID:                group.ID,
+		Name:              group.Name,
+		Type:              group.Type,
+		Code:              group.Code,
+		CreatorID:         strconv.FormatUint(uint64(group.CreatorID), 10),
+		MidpointLatitude:  group.MidpointLatitude,
+		MidpointLongitude: group.MidpointLongitude,
+		Radius:            group.Radius,
 	}, nil
 }

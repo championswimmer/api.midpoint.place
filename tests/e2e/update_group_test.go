@@ -7,7 +7,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
 	"github.com/championswimmer/api.midpoint.place/tests"
 	"github.com/gofiber/fiber/v2"
@@ -20,29 +19,10 @@ func TestGroupsRoute_UpdateGroup(t *testing.T) {
 	createdUser := tests.TestUtil_CreateUser(t, "testuser145", "testpassword145")
 
 	// Create a new group
-	reqBody := []byte(`{
-		"name": "Test Group 02",
-		"type": "public",
-		"radius": 800
-	}`)
+	createdGroup := tests.TestUtil_CreateGroup(t, createdUser.Token, "Test Group 03")
 
-	createGroupReq := httptest.NewRequest("POST", "/v1/groups", bytes.NewBuffer(reqBody))
-	createGroupReq.Header.Set("Content-Type", "application/json")
-	createGroupReq.Header.Set("Authorization", "Bearer "+createdUser.Token)
-
-	createGroupResp := lo.Must(tests.App.Test(createGroupReq, -1))
-	assert.Equal(t, fiber.StatusCreated, createGroupResp.StatusCode)
-
-	createGroupRespBody := lo.Must(io.ReadAll(createGroupResp.Body))
-	var createGroupRespData dto.GroupResponse
-	err := json.Unmarshal(createGroupRespBody, &createGroupRespData)
-	assert.NoError(t, err)
-	assert.Equal(t, "Test Group 02", createGroupRespData.Name)
-	assert.Equal(t, config.GroupTypePublic, createGroupRespData.Type)
-	assert.Equal(t, 800, createGroupRespData.Radius)
-
-	groupID := createGroupRespData.ID
-	groupCode := createGroupRespData.Code
+	groupID := createdGroup.ID
+	groupCode := createdGroup.Code
 
 	testcases := []struct {
 		name           string

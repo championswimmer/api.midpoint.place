@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/championswimmer/api.midpoint.place/src/dto"
 	"github.com/championswimmer/api.midpoint.place/tests"
@@ -19,38 +20,8 @@ func TestGroupsRoute_MembershipOperations(t *testing.T) {
 	user1 := tests.TestUtil_CreateUser(t, "testuser101", "testpassword101")
 	user2 := tests.TestUtil_CreateUser(t, "testuser201", "testpassword201")
 
-	// Create two groups
-	createGroup1Req := []byte(`{
-		"name": "Group 1",
-		"radius": 100
-	}`)
-
-	createGroup2Req := []byte(`{
-		"name": "Group 2",
-		"radius": 100
-	}`)
-
-	var group1, group2 *dto.GroupResponse
-
-	req := httptest.NewRequest("POST", "/v1/groups", bytes.NewBuffer(createGroup1Req))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+user1.Token)
-
-	resp := lo.Must(tests.App.Test(req, -1))
-	assert.Equal(t, fiber.StatusCreated, resp.StatusCode)
-	body := lo.Must(io.ReadAll(resp.Body))
-	err := json.Unmarshal(body, &group1)
-	assert.NoError(t, err)
-
-	req = httptest.NewRequest("POST", "/v1/groups", bytes.NewBuffer(createGroup2Req))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+user1.Token)
-
-	resp = lo.Must(tests.App.Test(req, -1))
-	assert.Equal(t, fiber.StatusCreated, resp.StatusCode)
-	body = lo.Must(io.ReadAll(resp.Body))
-	err = json.Unmarshal(body, &group2)
-	assert.NoError(t, err)
+	group1 := tests.TestUtil_CreateGroup(t, user1.Token, "Test Group 1")
+	group2 := tests.TestUtil_CreateGroup(t, user1.Token, "Test Group 2")
 
 	testcases := []struct {
 		name           string
@@ -108,6 +79,8 @@ func TestGroupsRoute_MembershipOperations(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
+			// sleep for 100ms
+			time.Sleep(100 * time.Millisecond)
 			req := httptest.NewRequest(tc.method, "/v1/groups/"+tc.groupID+"/join", bytes.NewBuffer(tc.requestBody))
 			req.Header.Set("Content-Type", "application/json")
 			req.Header.Set("Authorization", "Bearer "+user2.Token)

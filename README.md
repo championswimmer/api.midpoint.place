@@ -1,6 +1,16 @@
 # midpoint.place API
 
-[![codecov](https://codecov.io/gh/championswimmer/api.midpoint.place/graph/badge.svg?token=PYTQV9APHD)](https://codecov.io/gh/championswimmer/api.midpoint.place) 
+[![codecov](https://codecov.io/gh/championswimmer/api.midpoint.place/graph/badge.svg?token=PYTQV9APHD)](https://codecov.io/gh/championswimmer/api.midpoint.place)
+[![Go Report Card](https://goreportcard.com/badge/github.com/championswimmer/api.midpoint.place)](https://goreportcard.com/report/github.com/championswimmer/api.midpoint.place)
+
+
+[![Go](https://img.shields.io/badge/Go-00ADD8?style=flat&logo=go&logoColor=white)](https://go.dev/)
+[![Fiber](https://img.shields.io/badge/Fiber-292E33?style=flat&logo=fiber&logoColor=white)](https://github.com/gofiber/fiber)
+[![GORM](https://img.shields.io/badge/GORM-00ADD8?style=flat&logo=go&logoColor=white)](https://gorm.io)
+[![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Swagger 2.0](https://img.shields.io/badge/Swagger-2.0-85EA2D?style=flat&logo=swagger)](https://swagger.io/)
+
 
 ## Project Description
 

@@ -1,0 +1,39 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="white"/>
+  
+  <!-- Connecting Lines -->
+  <path d="M12 20L32 32" stroke="#33BFFF" stroke-width="2" stroke-dasharray="2 2"/>
+  <path d="M18 48L32 32" stroke="#33BFFF" stroke-width="2" stroke-dasharray="2 2"/>
+  <path d="M46 50L32 32" stroke="#33BFFF" stroke-width="2" stroke-dasharray="2 2"/>
+  <path d="M52 16L32 32" stroke="#33BFFF" stroke-width="2" stroke-dasharray="2 2"/>
+  
+  <!-- Small Location Points -->
+  <circle cx="12" cy="20" r="5" fill="#33BFFF"/>
+  <circle cx="18" cy="48" r="5" fill="#33BFFF"/>
+  <circle cx="46" cy="50" r="5" fill="#33BFFF"/>
+  <circle cx="52" cy="16" r="5" fill="#33BFFF"/>
+  
+  <!-- Center Target Rings -->
+  <circle cx="32" cy="32" r="14" fill="#FF5E7D" opacity="0.1"/>
+  <circle cx="32" cy="32" r="10" fill="#FF5E7D" opacity="0.2"/>
+  <circle cx="32" cy="32" r="6" fill="#FF5E7D"/>
+  
+  <!-- Mathematical Symbols -->
+  <path d="M32 8V14" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/>
+  <path d="M32 50V56" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/>
+  <path d="M8 32H14" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/>
+  <path d="M50 32H56" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Calculation Elements -->
+  <path d="M20 8H44" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/>
+  <path d="M20 12H44" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/>
+  <path d="M26 10L38 10" stroke="#FF5E7D" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Formula Labels -->
+  <path d="M44 56V52H56V56H44Z" fill="#7B61FF"/>
+  <path d="M48 52V48" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/>
+  <path d="M52 52V48" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/>
+  <path d="M8 56V52H20V56H8Z" fill="#7B61FF"/>
+  <path d="M12 52V48" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/>
+  <path d="M16 52V48" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/>
+</svg> 

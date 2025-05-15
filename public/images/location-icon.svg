@@ -1,17 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="32" cy="32" r="30" fill="white"/>
-  <path d="M32 12C23.1634 12 16 19.1634 16 28C16 30.8002 16.7531 33.5254 18.1433 35.9171L30.5732 56.9736C30.8466 57.4453 31.3993 57.7071 32 57.7071C32.6007 57.7071 33.1534 57.4453 33.4268 56.9736L45.8567 35.9171C47.2469 33.5254 48 30.8002 48 28C48 19.1634 40.8366 12 32 12ZM32 38C26.4771 38 22 33.5228 22 28C22 22.4771 26.4771 18 32 18C37.5229 18 42 22.4771 42 28C42 33.5228 37.5229 38 32 38Z" fill="#33BFFF"/>
-  <circle cx="32" cy="28" r="6" fill="#33BFFF"/>
-  <path d="M32 14C24.268 14 18 20.268 18 28C18 30.3999 18.6395 32.7322 19.8305 34.7834L31.1462 54.0615C31.4663 54.6182 32.5337 54.6182 32.8538 54.0615L44.1695 34.7834C45.3605 32.7322 46 30.3999 46 28C46 20.268 39.732 14 32 14ZM32 36C27.5817 36 24 32.4183 24 28C24 23.5817 27.5817 20 32 20C36.4183 20 40 23.5817 40 28C40 32.4183 36.4183 36 32 36Z" fill="#FF5E7D"/>
-  <circle cx="32" cy="28" r="8" stroke="#FF5E7D" stroke-width="2"/>
-  <circle cx="32" cy="28" r="4" fill="#FF5E7D"/>
-  
-  <!-- Radar ping effects -->
-  <circle cx="32" cy="28" r="12" stroke="#FF5E7D" stroke-width="1" stroke-dasharray="2 2" opacity="0.5"/>
-  <circle cx="32" cy="28" r="16" stroke="#FF5E7D" stroke-width="1" stroke-dasharray="2 2" opacity="0.3"/>
-  <circle cx="32" cy="28" r="20" stroke="#FF5E7D" stroke-width="1" stroke-dasharray="2 2" opacity="0.1"/>
-  
-  <!-- Location share icon -->
-  <circle cx="48" cy="16" r="8" fill="#33BFFF"/>
-  <path d="M44 16H52M48 12V20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Location Pin -->
+    <path d="M32 4C21 4 12 13 12 24C12 39 32 60 32 60C32 60 52 39 52 24C52 13 43 4 32 4ZM32 32C27.6 32 24 28.4 24 24C24 19.6 27.6 16 32 16C36.4 16 40 19.6 40 24C40 28.4 36.4 32 32 32Z" fill="#FF6B6B"/>
+    
+    <!-- Signal Waves -->
+    <path d="M16 24C16 15.2 23.2 8 32 8" stroke="#4ECDC4" stroke-width="4" stroke-linecap="round" stroke-dasharray="4 4"/>
+    <path d="M48 24C48 15.2 40.8 8 32 8" stroke="#4ECDC4" stroke-width="4" stroke-linecap="round" stroke-dasharray="4 4"/>
 </svg> 

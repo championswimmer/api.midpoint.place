@@ -1,134 +1,37 @@
-<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Map Background -->
-  <rect width="600" height="400" rx="20" fill="#F5F7F9"/>
-  
-  <!-- City Grid -->
-  <g opacity="0.1">
-    <path d="M0 50H600" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M0 100H600" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M0 150H600" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M0 200H600" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M0 250H600" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M0 300H600" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M0 350H600" stroke="#1A1A2E" stroke-width="1"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background Map Grid -->
+    <path d="M0 0 L800 0 L800 600 L0 600 Z" fill="#F8F9FA"/>
+    <path d="M0 0 L800 600" stroke="#E9ECEF" stroke-width="1"/>
+    <path d="M800 0 L0 600" stroke="#E9ECEF" stroke-width="1"/>
     
-    <path d="M50 0V400" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M100 0V400" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M150 0V400" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M200 0V400" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M250 0V400" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M300 0V400" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M350 0V400" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M400 0V400" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M450 0V400" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M500 0V400" stroke="#1A1A2E" stroke-width="1"/>
-    <path d="M550 0V400" stroke="#1A1A2E" stroke-width="1"/>
-  </g>
-  
-  <!-- Buildings -->
-  <rect x="30" y="40" width="50" height="80" fill="#E1E8ED"/>
-  <rect x="40" y="60" width="10" height="10" fill="#33BFFF"/>
-  <rect x="60" y="60" width="10" height="10" fill="#33BFFF"/>
-  <rect x="40" y="80" width="10" height="10" fill="#33BFFF"/>
-  <rect x="60" y="80" width="10" height="10" fill="#33BFFF"/>
-  <rect x="40" y="100" width="10" height="10" fill="#33BFFF"/>
-  <rect x="60" y="100" width="10" height="10" fill="#33BFFF"/>
-  
-  <rect x="100" y="60" width="40" height="60" fill="#E1E8ED"/>
-  <rect x="110" y="70" width="8" height="8" fill="#33BFFF"/>
-  <rect x="125" y="70" width="8" height="8" fill="#33BFFF"/>
-  <rect x="110" y="85" width="8" height="8" fill="#33BFFF"/>
-  <rect x="125" y="85" width="8" height="8" fill="#33BFFF"/>
-  <rect x="110" y="100" width="8" height="8" fill="#33BFFF"/>
-  <rect x="125" y="100" width="8" height="8" fill="#33BFFF"/>
-  
-  <rect x="500" y="50" width="60" height="90" fill="#E1E8ED"/>
-  <rect x="510" y="70" width="10" height="10" fill="#33BFFF"/>
-  <rect x="530" y="70" width="10" height="10" fill="#33BFFF"/>
-  <rect x="510" y="90" width="10" height="10" fill="#33BFFF"/>
-  <rect x="530" y="90" width="10" height="10" fill="#33BFFF"/>
-  <rect x="510" y="110" width="10" height="10" fill="#33BFFF"/>
-  <rect x="530" y="110" width="10" height="10" fill="#33BFFF"/>
-  
-  <rect x="420" y="80" width="50" height="70" fill="#E1E8ED"/>
-  <rect x="430" y="90" width="10" height="10" fill="#33BFFF"/>
-  <rect x="450" y="90" width="10" height="10" fill="#33BFFF"/>
-  <rect x="430" y="110" width="10" height="10" fill="#33BFFF"/>
-  <rect x="450" y="110" width="10" height="10" fill="#33BFFF"/>
-  <rect x="430" y="130" width="10" height="10" fill="#33BFFF"/>
-  <rect x="450" y="130" width="10" height="10" fill="#33BFFF"/>
-  
-  <!-- Parks and POIs -->
-  <circle cx="200" cy="100" r="30" fill="#A3E4D7" opacity="0.7"/>
-  <circle cx="350" cy="80" r="25" fill="#A3E4D7" opacity="0.7"/>
-  <circle cx="450" cy="300" r="35" fill="#A3E4D7" opacity="0.7"/>
-  <circle cx="150" cy="320" r="40" fill="#A3E4D7" opacity="0.7"/>
-  
-  <!-- Routes -->
-  <path d="M80 200 L300 200" stroke="#FF5E7D" stroke-width="4" stroke-dasharray="8 4"/>
-  <path d="M520 200 L300 200" stroke="#FF5E7D" stroke-width="4" stroke-dasharray="8 4"/>
-  <path d="M300 350 L300 200" stroke="#FF5E7D" stroke-width="4" stroke-dasharray="8 4"/>
-  <path d="M300 50 L300 200" stroke="#FF5E7D" stroke-width="4" stroke-dasharray="8 4"/>
-  
-  <!-- Midpoint Circle -->
-  <circle cx="300" cy="200" r="40" fill="#FF5E7D" opacity="0.2"/>
-  <circle cx="300" cy="200" r="15" fill="#FF5E7D"/>
-  
-  <!-- Venue Icons at Midpoint -->
-  <circle cx="280" cy="160" r="10" fill="#7B61FF"/>
-  <rect x="275" y="155" width="10" height="10" fill="white"/>
-  <path d="M275 160 H285 M280 155 V165" stroke="#7B61FF" stroke-width="2"/>
-  
-  <circle cx="320" cy="170" r="10" fill="#33BFFF"/>
-  <path d="M315 170 H325 M320 165 V175" stroke="white" stroke-width="2"/>
-  
-  <circle cx="330" cy="210" r="10" fill="#FFA41B"/>
-  <path d="M325 210 H335 M330 205 V215" stroke="white" stroke-width="2"/>
-  
-  <circle cx="270" cy="220" r="10" fill="#00CC88"/>
-  <path d="M265 220 H275 M270 215 V225" stroke="white" stroke-width="2"/>
-  
-  <!-- People -->
-  <!-- Person 1 - Top -->
-  <circle cx="300" cy="50" r="15" fill="#33BFFF"/>
-  <circle cx="300" cy="40" r="7" fill="#F5F7F9"/>
-  <rect x="295" y="47" width="10" height="12" rx="5" fill="#33BFFF"/>
-  
-  <!-- Person 2 - Right -->
-  <circle cx="520" cy="200" r="15" fill="#33BFFF"/>
-  <circle cx="520" cy="190" r="7" fill="#F5F7F9"/>
-  <rect x="515" y="197" width="10" height="12" rx="5" fill="#33BFFF"/>
-  
-  <!-- Person 3 - Bottom -->
-  <circle cx="300" cy="350" r="15" fill="#33BFFF"/>
-  <circle cx="300" cy="340" r="7" fill="#F5F7F9"/>
-  <rect x="295" y="347" width="10" height="12" rx="5" fill="#33BFFF"/>
-  
-  <!-- Person 4 - Left -->
-  <circle cx="80" cy="200" r="15" fill="#33BFFF"/>
-  <circle cx="80" cy="190" r="7" fill="#F5F7F9"/>
-  <rect x="75" y="197" width="10" height="12" rx="5" fill="#33BFFF"/>
-  
-  <!-- Location Pins -->
-  <path d="M300 50 L300 20 Q300 10 310 10 H320 Q330 10 330 20 L330 30 Z" fill="#FF5E7D"/>
-  <circle cx="315" cy="20" r="5" fill="white"/>
-  
-  <path d="M520 200 L530 170 Q530 160 540 160 H550 Q560 160 560 170 L560 180 Z" fill="#FF5E7D"/>
-  <circle cx="545" cy="170" r="5" fill="white"/>
-  
-  <path d="M300 350 L300 380 Q300 390 310 390 H320 Q330 390 330 380 L330 370 Z" fill="#FF5E7D"/>
-  <circle cx="315" cy="380" r="5" fill="white"/>
-  
-  <path d="M80 200 L70 170 Q70 160 60 160 H50 Q40 160 40 170 L40 180 Z" fill="#FF5E7D"/>
-  <circle cx="55" cy="170" r="5" fill="white"/>
-  
-  <!-- Central Midpoint Pin -->
-  <path d="M300 200 L300 170 Q300 160 310 160 H320 Q330 160 330 170 L330 180 Z" fill="#7B61FF"/>
-  <circle cx="315" cy="170" r="5" fill="white"/>
-  
-  <!-- Device Screen Frame -->
-  <rect x="150" y="380" width="300" height="40" rx="10" fill="#1A1A2E"/>
-  <rect x="160" y="390" width="280" height="20" rx="5" fill="#F5F7F9"/>
-  <circle cx="300" cy="400" r="8" fill="#33BFFF"/>
-  <path d="M295 400 H305" stroke="#1A1A2E" stroke-width="2"/>
+    <!-- Map Points -->
+    <circle cx="200" cy="150" r="20" fill="#FF6B6B"/>
+    <circle cx="600" cy="200" r="20" fill="#FF6B6B"/>
+    <circle cx="150" cy="450" r="20" fill="#FF6B6B"/>
+    <circle cx="650" cy="500" r="20" fill="#FF6B6B"/>
+    
+    <!-- Connection Lines -->
+    <path d="M200 150 L400 300" stroke="#4ECDC4" stroke-width="4" stroke-dasharray="8 4"/>
+    <path d="M600 200 L400 300" stroke="#4ECDC4" stroke-width="4" stroke-dasharray="8 4"/>
+    <path d="M150 450 L400 300" stroke="#4ECDC4" stroke-width="4" stroke-dasharray="8 4"/>
+    <path d="M650 500 L400 300" stroke="#4ECDC4" stroke-width="4" stroke-dasharray="8 4"/>
+    
+    <!-- Center Point -->
+    <circle cx="400" cy="300" r="30" fill="#4ECDC4"/>
+    <circle cx="400" cy="300" r="15" fill="#FFFFFF"/>
+    
+    <!-- Location Icons -->
+    <g transform="translate(185,135)">
+        <path d="M15 0C6.75 0 0 6.75 0 15C0 26.25 15 45 15 45C15 45 30 26.25 30 15C30 6.75 23.25 0 15 0ZM15 20C12.25 20 10 17.75 10 15C10 12.25 12.25 10 15 10C17.75 10 20 12.25 20 15C20 17.75 17.75 20 15 20Z" fill="#FFFFFF"/>
+    </g>
+    <g transform="translate(585,185)">
+        <path d="M15 0C6.75 0 0 6.75 0 15C0 26.25 15 45 15 45C15 45 30 26.25 30 15C30 6.75 23.25 0 15 0ZM15 20C12.25 20 10 17.75 10 15C10 12.25 12.25 10 15 10C17.75 10 20 12.25 20 15C20 17.75 17.75 20 15 20Z" fill="#FFFFFF"/>
+    </g>
+    <g transform="translate(135,435)">
+        <path d="M15 0C6.75 0 0 6.75 0 15C0 26.25 15 45 15 45C15 45 30 26.25 30 15C30 6.75 23.25 0 15 0ZM15 20C12.25 20 10 17.75 10 15C10 12.25 12.25 10 15 10C17.75 10 20 12.25 20 15C20 17.75 17.75 20 15 20Z" fill="#FFFFFF"/>
+    </g>
+    <g transform="translate(635,485)">
+        <path d="M15 0C6.75 0 0 6.75 0 15C0 26.25 15 45 15 45C15 45 30 26.25 30 15C30 6.75 23.25 0 15 0ZM15 20C12.25 20 10 17.75 10 15C10 12.25 12.25 10 15 10C17.75 10 20 12.25 20 15C20 17.75 17.75 20 15 20Z" fill="#FFFFFF"/>
+    </g>
 </svg> 

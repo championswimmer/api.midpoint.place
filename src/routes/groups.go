@@ -35,10 +35,10 @@ func GroupsRoute() func(router fiber.Router) {
 // @Accept json
 // @Produce json
 // @Param group body dto.CreateGroupRequest true "Group"
-// @Success 201 {object} dto.GroupResponse
-// @Failure 400 {object} dto.ErrorResponse
-// @Failure 422 {object} dto.ErrorResponse
-// @Failure 500 {object} dto.ErrorResponse
+// @Success 201 {object} dto.GroupResponse "Group created successfully"
+// @Failure 400 {object} dto.ErrorResponse "Invalid request"
+// @Failure 422 {object} dto.ErrorResponse "Group info validation failed"
+// @Failure 500 {object} dto.ErrorResponse "Failed to create group"
 // @Router /groups [post]
 // @Security BearerAuth
 func createGroup(ctx *fiber.Ctx) error {
@@ -70,11 +70,11 @@ func createGroup(ctx *fiber.Ctx) error {
 // @Produce json
 // @Param groupIdOrCode path string true "Group ID or Code"
 // @Param group body dto.UpdateGroupRequest true "Group Update Data"
-// @Success 200 {object} dto.GroupResponse
-// @Failure 400 {object} dto.ErrorResponse
-// @Failure 404 {object} dto.ErrorResponse
-// @Failure 422 {object} dto.ErrorResponse
-// @Failure 500 {object} dto.ErrorResponse
+// @Success 200 {object} dto.GroupResponse "Group updated successfully"
+// @Failure 400 {object} dto.ErrorResponse "Invalid request"
+// @Failure 404 {object} dto.ErrorResponse "Group not found"
+// @Failure 422 {object} dto.ErrorResponse "Group info validation failed"
+// @Failure 500 {object} dto.ErrorResponse "Failed to update group"
 // @Router /groups/{groupIdOrCode} [patch]
 // @Security BearerAuth
 func updateGroup(ctx *fiber.Ctx) error {
@@ -111,9 +111,9 @@ func updateGroup(ctx *fiber.Ctx) error {
 // @Param groupIdOrCode path string true "Group ID or Code"
 // @Param groupUser body dto.GroupUserJoinRequest true "Group User"
 // @Success 200 {object} dto.GroupUserResponse
-// @Failure 400 {object} dto.ErrorResponse
-// @Failure 404 {object} dto.ErrorResponse
-// @Failure 500 {object} dto.ErrorResponse
+// @Failure 400 {object} dto.ErrorResponse "Invalid request"
+// @Failure 404 {object} dto.ErrorResponse "Group not found"
+// @Failure 500 {object} dto.ErrorResponse "Failed to join group"
 // @Router /groups/{groupIdOrCode}/join [put]
 // @Security BearerAuth
 func joinGroup(ctx *fiber.Ctx) error {
@@ -152,9 +152,9 @@ func joinGroup(ctx *fiber.Ctx) error {
 // @Produce json
 // @Param groupIdOrCode path string true "Group ID or Code"
 // @Success 200 {object} dto.GroupUserResponse
-// @Failure 400 {object} dto.ErrorResponse
-// @Failure 404 {object} dto.ErrorResponse
-// @Failure 500 {object} dto.ErrorResponse
+// @Failure 400 {object} dto.ErrorResponse "Invalid request"
+// @Failure 404 {object} dto.ErrorResponse "Group not found"
+// @Failure 500 {object} dto.ErrorResponse "Failed to leave group"
 // @Router /groups/{groupIdOrCode}/join [delete]
 // @Security BearerAuth
 func leaveGroup(ctx *fiber.Ctx) error {
@@ -180,9 +180,9 @@ func leaveGroup(ctx *fiber.Ctx) error {
 // @Produce json
 // @Param groupIdOrCode path string true "Group ID or Code"
 // @Success 200 {object} dto.GroupResponse
-// @Failure 400 {object} dto.ErrorResponse
-// @Failure 404 {object} dto.ErrorResponse
-// @Failure 500 {object} dto.ErrorResponse
+// @Failure 400 {object} dto.ErrorResponse "Invalid request"
+// @Failure 404 {object} dto.ErrorResponse "Group not found"
+// @Failure 500 {object} dto.ErrorResponse "Failed to get group"
 // @Router /groups/{groupIdOrCode} [get]
 // @Security BearerAuth
 func getGroup(ctx *fiber.Ctx) error {

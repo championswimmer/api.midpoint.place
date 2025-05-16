@@ -129,10 +129,33 @@ definitions:
         - protected
         - private
     type: object
+  dto.UserResponse:
+    properties:
+      id:
+        type: string
+      location:
+        $ref: '#/definitions/dto.Location'
+      token:
+        type: string
+      username:
+        type: string
+    type: object
   dto.UserUpdateRequest:
     properties:
       location:
         $ref: '#/definitions/dto.Location'
+    type: object
+  dto.WaitlistSignupRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  dto.WaitlistSignupResponse:
+    properties:
+      message:
+        type: string
     type: object
 host: api.midpoint.place
 info:
@@ -179,6 +202,39 @@ paths:
       tags:
       - groups
   /groups/{groupIdOrCode}:
+    get:
+      description: Get details of a group by ID or code
+      operationId: get-group
+      parameters:
+      - description: Group ID or Code
+        in: path
+        name: groupIdOrCode
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GroupResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get group information
+      tags:
+      - groups
     patch:
       consumes:
       - application/json
@@ -312,7 +368,19 @@ paths:
           $ref: '#/definitions/dto.CreateUserRequest'
       produces:
       - application/json
-      responses: {}
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
       summary: Register a new user
       tags:
       - users
@@ -361,6 +429,41 @@ paths:
       summary: Login a user
       tags:
       - users
+  /waitlist/signup:
+    post:
+      consumes:
+      - application/json
+      description: Add a user to the waitlist
+      operationId: add-to-waitlist
+      parameters:
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.WaitlistSignupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.WaitlistSignupResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "409":
+          description: Email already signed up
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Failed to add to waitlist
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Add a user to the waitlist
+      tags:
+      - waitlist
 schemes:
 - http
 - https

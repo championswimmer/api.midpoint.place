@@ -21,27 +21,17 @@ func CreateWaitlistController() *WaitlistController {
 	}
 }
 
-func (c *WaitlistController) AddToWaitlist(ctx *fiber.Ctx) error {
-	req := new(dto.WaitlistSignupRequest)
-	if err := ctx.BodyParser(req); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid request",
-		})
-	}
+func (c *WaitlistController) AddToWaitlist(req *dto.WaitlistSignupRequest) (*dto.WaitlistSignupResponse, error) {
 
 	// Validate email format
 	if !isValidEmail(req.Email) {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid email format",
-		})
+		return nil, fiber.NewError(fiber.StatusBadRequest, "Invalid email format")
 	}
 
 	// Check for duplicates
 	var existingSignup models.WaitlistSignup
 	if err := c.db.Where("email = ?", req.Email).First(&existingSignup).Error; err == nil {
-		return ctx.Status(fiber.StatusConflict).JSON(fiber.Map{
-			"message": "Email already signed up",
-		})
+		return nil, fiber.NewError(fiber.StatusConflict, "Email already signed up")
 	}
 
 	// Add to waitlist
@@ -49,14 +39,12 @@ func (c *WaitlistController) AddToWaitlist(ctx *fiber.Ctx) error {
 		Email: req.Email,
 	}
 	if err := c.db.Create(&waitlistSignup).Error; err != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Failed to add to waitlist",
-		})
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to add to waitlist")
 	}
 
-	return ctx.Status(fiber.StatusCreated).JSON(dto.WaitlistSignupResponse{
+	return &dto.WaitlistSignupResponse{
 		Message: "Successfully added to waitlist",
-	})
+	}, nil
 }
 
 func isValidEmail(email string) bool {

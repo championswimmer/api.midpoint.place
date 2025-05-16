@@ -32,6 +32,7 @@ func CreateServer() *fiber.App {
 
 	apiV1.Route("/users", routes.UsersRoute())
 	apiV1.Route("/groups", routes.GroupsRoute())
+	apiV1.Route("/waitlist", routes.WaitlistRoute())
 
 	app.Get("/docs/*", swagger.HandlerDefault)
 

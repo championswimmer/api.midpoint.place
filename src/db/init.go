@@ -57,6 +57,7 @@ func GetAppDB() *gorm.DB {
 		lo.Must0(appDB.AutoMigrate(&models.User{}))
 		lo.Must0(appDB.AutoMigrate(&models.Group{}))
 		lo.Must0(appDB.AutoMigrate(&models.GroupUser{}))
+		lo.Must0(appDB.AutoMigrate(&models.WaitlistSignup{}))
 
 	})
 

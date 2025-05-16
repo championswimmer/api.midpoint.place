@@ -15,7 +15,12 @@ require (
 	gorm.io/gorm v1.25.10
 )
 
-require github.com/swaggo/files/v2 v2.0.2 // indirect
+require (
+	github.com/swaggo/files/v2 v2.0.2 // indirect
+	go.opencensus.io v0.22.3 // indirect
+	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1 // indirect
+	googlemaps.github.io/maps v1.7.0 // indirect
+)
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect

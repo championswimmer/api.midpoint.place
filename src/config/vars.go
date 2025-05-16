@@ -18,6 +18,8 @@ var Port string
 var JWTSigningKey string
 var JWTExpirationDays int
 
+var GoogleMapsAPIKey string
+
 // should run after env.go#init as this `vars` is alphabetically after `env`
 func init() {
 	Env, _ = lo.Coalesce(
@@ -38,4 +40,6 @@ func init() {
 
 	JWTSigningKey = os.Getenv("JWT_SIGNING_KEY")
 	JWTExpirationDays, _ = strconv.Atoi(os.Getenv("JWT_EXPIRATION_DAYS"))
+
+	GoogleMapsAPIKey = os.Getenv("GOOGLE_MAPS_API_KEY")
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/db"
 	"github.com/championswimmer/api.midpoint.place/src/server"
+	"github.com/championswimmer/api.midpoint.place/src/services"
 	"github.com/championswimmer/api.midpoint.place/src/utils/applogger"
 	"github.com/samber/lo"
 )
@@ -21,6 +22,9 @@ func main() {
 
 	// initialize server
 	server := server.CreateServer()
+
+	// initialize place search service
+	placesClient := services.GetGooglePlacesClient()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGTERM)
@@ -35,6 +39,10 @@ func main() {
 		defer cancel()
 
 		server.ShutdownWithContext(ctx)
+
+		// close places client
+		applogger.Info("Closing places client...")
+		lo.Must0(placesClient.Close())
 
 		// shutdown db
 		applogger.Info("Closing db connection...")

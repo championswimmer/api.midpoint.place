@@ -19,3 +19,12 @@ const (
 	GroupUserAdmin  GroupUserRole = "admin"
 	GroupUserMember GroupUserRole = "member"
 )
+
+type PlaceType string
+
+const (
+	PlaceTypeRestaurant PlaceType = "restaurant"
+	PlaceTypeBar        PlaceType = "bar"
+	PlaceTypeCafe       PlaceType = "cafe"
+	PlaceTypePark       PlaceType = "park"
+)

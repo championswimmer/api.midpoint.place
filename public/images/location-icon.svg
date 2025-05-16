@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Location Pin -->
-    <path d="M32 4C21 4 12 13 12 24C12 39 32 60 32 60C32 60 52 39 52 24C52 13 43 4 32 4ZM32 32C27.6 32 24 28.4 24 24C24 19.6 27.6 16 32 16C36.4 16 40 19.6 40 24C40 28.4 36.4 32 32 32Z" fill="#FF6B6B"/>
-    
-    <!-- Signal Waves -->
-    <path d="M16 24C16 15.2 23.2 8 32 8" stroke="#4ECDC4" stroke-width="4" stroke-linecap="round" stroke-dasharray="4 4"/>
-    <path d="M48 24C48 15.2 40.8 8 32 8" stroke="#4ECDC4" stroke-width="4" stroke-linecap="round" stroke-dasharray="4 4"/>
-</svg> 

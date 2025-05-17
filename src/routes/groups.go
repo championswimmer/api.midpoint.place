@@ -190,9 +190,17 @@ func getGroup(ctx *fiber.Ctx) error {
 	groupIDOrCode := ctx.Params("groupIdOrCode")
 	includeUsers := ctx.QueryBool("includeUsers", false)
 
-	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode, includeUsers)
+	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode)
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
+	}
+
+	if includeUsers {
+		groupUsers, err := groupUsersController.GetGroupMembers(group.ID)
+		if err != nil {
+			return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
+		}
+		group.Members = groupUsers
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(group)

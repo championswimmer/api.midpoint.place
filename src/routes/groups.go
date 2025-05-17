@@ -80,7 +80,7 @@ func createGroup(ctx *fiber.Ctx) error {
 func updateGroup(ctx *fiber.Ctx) error {
 	groupID := ctx.Params("groupIdOrCode")
 
-	group, err := groupsController.GetGroupByIDorCode(groupID, false)
+	group, err := groupsController.GetGroupByIDorCode(groupID)
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
@@ -120,7 +120,7 @@ func joinGroup(ctx *fiber.Ctx) error {
 	user := ctx.Locals(config.LOCALS_USER).(*models.User)
 	groupIDOrCode := ctx.Params("groupIdOrCode")
 
-	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode, false)
+	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode)
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
@@ -161,7 +161,7 @@ func leaveGroup(ctx *fiber.Ctx) error {
 	user := ctx.Locals(config.LOCALS_USER).(*models.User)
 	groupIDOrCode := ctx.Params("groupIdOrCode")
 
-	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode, false)
+	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode)
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}

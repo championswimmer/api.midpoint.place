@@ -80,7 +80,7 @@ func createGroup(ctx *fiber.Ctx) error {
 func updateGroup(ctx *fiber.Ctx) error {
 	groupID := ctx.Params("groupIdOrCode")
 
-	group, err := groupsController.GetGroupByIDorCode(groupID)
+	group, err := groupsController.GetGroupByIDorCode(groupID, false)
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
@@ -120,7 +120,7 @@ func joinGroup(ctx *fiber.Ctx) error {
 	user := ctx.Locals(config.LOCALS_USER).(*models.User)
 	groupIDOrCode := ctx.Params("groupIdOrCode")
 
-	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode)
+	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode, false)
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
@@ -161,7 +161,7 @@ func leaveGroup(ctx *fiber.Ctx) error {
 	user := ctx.Locals(config.LOCALS_USER).(*models.User)
 	groupIDOrCode := ctx.Params("groupIdOrCode")
 
-	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode)
+	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode, false)
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
@@ -179,6 +179,7 @@ func leaveGroup(ctx *fiber.Ctx) error {
 // @ID get-group
 // @Produce json
 // @Param groupIdOrCode path string true "Group ID or Code"
+// @Param includeUsers query bool false "Include Users"
 // @Success 200 {object} dto.GroupResponse
 // @Failure 400 {object} dto.ErrorResponse "Invalid request"
 // @Failure 404 {object} dto.ErrorResponse "Group not found"
@@ -187,8 +188,9 @@ func leaveGroup(ctx *fiber.Ctx) error {
 // @Security BearerAuth
 func getGroup(ctx *fiber.Ctx) error {
 	groupIDOrCode := ctx.Params("groupIdOrCode")
+	includeUsers := ctx.QueryBool("includeUsers", false)
 
-	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode)
+	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode, includeUsers)
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}

@@ -50,7 +50,7 @@ func generateRandomSecret() string {
 	return fmt.Sprintf("%06d", n.Int64()+100000)
 }
 
-func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string) (*dto.GroupResponse, error) {
+func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers bool) (*dto.GroupResponse, error) {
 	var group models.Group
 
 	// Check if input is valid UUID or 10-char alphanumeric code
@@ -79,7 +79,7 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string) (*dto.GroupR
 		return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
 	}
 
-	return &dto.GroupResponse{
+	groupResponse := &dto.GroupResponse{
 		ID:                group.ID,
 		Name:              group.Name,
 		Type:              group.Type,
@@ -88,7 +88,18 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string) (*dto.GroupR
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
 		Radius:            group.Radius,
-	}, nil
+	}
+
+	if includeUsers {
+		groupUsersController := CreateGroupUsersController()
+		members, err := groupUsersController.GetGroupMembers(group.ID)
+		if err != nil {
+			return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch group members")
+		}
+		groupResponse.Members = members
+	}
+
+	return groupResponse, nil
 }
 
 func (c *GroupsController) CreateGroup(creatorID uint, req *dto.CreateGroupRequest) (*dto.GroupResponse, error) {

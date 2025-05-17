@@ -128,3 +128,53 @@ func (c *GroupUsersController) CalculateGroupCentroid(groupID string) (latitude 
 
 	return centroidLatitude, centroidLongitude, nil
 }
+
+// GroupMembershipCheck checks if a user belongs to a specified group
+// Returns true if the user is a member of the group, false otherwise
+func (c *GroupUsersController) GroupMembershipCheck(groupID string, userID uint) (bool, error) {
+	var groupUser models.GroupUser
+	result := c.db.Where("user_id = ? AND group_id = ?", userID, groupID).First(&groupUser)
+
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			// User is not in the group
+			return false, nil
+		}
+		// Return other errors
+		return false, fiber.NewError(fiber.StatusInternalServerError, "Failed to check group membership")
+	}
+
+	// User is in the group
+	return true, nil
+}
+
+// GetGroupMembers fetches all members of a group
+// Returns a slice of GroupUserResponse for all users in the group
+func (c *GroupUsersController) GetGroupMembers(groupID string) ([]dto.GroupUserResponse, error) {
+	// Check if group exists
+	var group models.Group
+	if err := c.db.First(&group, "id = ?", groupID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
+		}
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to check group existence")
+	}
+
+	var groupUsers []models.GroupUser
+
+	if err := c.db.Where("group_id = ?", groupID).Find(&groupUsers).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch group members")
+	}
+
+	response := make([]dto.GroupUserResponse, len(groupUsers))
+	for i, groupUser := range groupUsers {
+		response[i] = dto.GroupUserResponse{
+			UserID:    strconv.Itoa(int(groupUser.UserID)),
+			GroupID:   groupUser.GroupID,
+			Latitude:  groupUser.Latitude,
+			Longitude: groupUser.Longitude,
+		}
+	}
+
+	return response, nil
+}

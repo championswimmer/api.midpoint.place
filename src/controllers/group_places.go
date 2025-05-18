@@ -34,51 +34,65 @@ func (c *GroupPlacesController) AddPlacesToGroup(groupID string, req *dto.GroupP
 	// Create transaction to ensure atomicity
 	var responses []dto.GroupPlaceResponse
 	err := c.db.Transaction(func(tx *gorm.DB) error {
-		for _, place := range req.Places {
-			// Check if place already exists for this group
-			var existingGroupPlace models.GroupPlace
-			result := tx.Where("group_id = ? AND place_id = ?", groupID, place.Id).First(&existingGroupPlace)
+		// First, check for existing places to avoid duplicates
+		var existingPlaceIDs []string
+		if err := tx.Model(&models.GroupPlace{}).
+			Where("group_id = ?", groupID).
+			Pluck("place_id", &existingPlaceIDs).Error; err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch existing places")
+		}
 
-			if result.Error == nil {
-				// Place already exists for this group, skip it
+		// Create a map for O(1) lookups
+		existingPlaceMap := make(map[string]bool)
+		for _, id := range existingPlaceIDs {
+			existingPlaceMap[id] = true
+		}
+
+		// Filter out places that already exist
+		var newPlaces []models.GroupPlace
+		for _, place := range req.Places {
+			if existingPlaceMap[place.Id] {
 				applogger.Info("Place", place.Id, "already exists for group", groupID, "- skipping")
 				continue
-			} else if result.Error != gorm.ErrRecordNotFound {
-				// Some other error occurred
-				return fiber.NewError(fiber.StatusInternalServerError, "Failed to check if place exists")
 			}
 
-			// Add place to group
+			// Add place to batch
 			groupPlace := models.GroupPlace{
 				ID:        uuid.New(),
 				GroupId:   groupID,
 				PlaceId:   place.Id,
 				Name:      place.Name,
 				Address:   place.Address,
-				Type:      string(place.Type),
+				Type:      place.Type,
 				Rating:    place.Rating,
 				MapURI:    place.MapURI,
 				Latitude:  place.Latitude,
 				Longitude: place.Longitude,
 			}
+			newPlaces = append(newPlaces, groupPlace)
+		}
 
-			if err := tx.Create(&groupPlace).Error; err != nil {
-				return fiber.NewError(fiber.StatusInternalServerError, "Failed to add place to group")
+		// Bulk insert if there are any new places
+		if len(newPlaces) > 0 {
+			if err := tx.Create(&newPlaces).Error; err != nil {
+				return fiber.NewError(fiber.StatusInternalServerError, "Failed to add places to group")
 			}
 
-			// Add to response
-			responses = append(responses, dto.GroupPlaceResponse{
-				ID:        groupPlace.ID.String(),
-				GroupID:   groupPlace.GroupId,
-				PlaceID:   groupPlace.PlaceId,
-				Name:      groupPlace.Name,
-				Address:   groupPlace.Address,
-				Type:      place.Type,
-				Rating:    groupPlace.Rating,
-				MapURI:    groupPlace.MapURI,
-				Latitude:  groupPlace.Latitude,
-				Longitude: groupPlace.Longitude,
-			})
+			// Prepare responses
+			for _, groupPlace := range newPlaces {
+				responses = append(responses, dto.GroupPlaceResponse{
+					ID:        groupPlace.ID.String(),
+					GroupID:   groupPlace.GroupId,
+					PlaceID:   groupPlace.PlaceId,
+					Name:      groupPlace.Name,
+					Address:   groupPlace.Address,
+					Type:      config.PlaceType(groupPlace.Type),
+					Rating:    groupPlace.Rating,
+					MapURI:    groupPlace.MapURI,
+					Latitude:  groupPlace.Latitude,
+					Longitude: groupPlace.Longitude,
+				})
+			}
 		}
 		return nil
 	})

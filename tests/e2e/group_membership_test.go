@@ -45,7 +45,7 @@ func TestGroupsRoute_MembershipOperations(t *testing.T) {
 				err := json.Unmarshal(body, &groupUserResp)
 				assert.NoError(t, err)
 				assert.Equal(t, group1.ID, groupUserResp.GroupID)
-				assert.Equal(t, user2.Id, groupUserResp.UserID)
+				assert.Equal(t, user2.ID, groupUserResp.UserID)
 			},
 		},
 		{
@@ -62,7 +62,7 @@ func TestGroupsRoute_MembershipOperations(t *testing.T) {
 				err := json.Unmarshal(body, &groupUserResp)
 				assert.NoError(t, err)
 				assert.Equal(t, group2.ID, groupUserResp.GroupID)
-				assert.Equal(t, user2.Id, groupUserResp.UserID)
+				assert.Equal(t, user2.ID, groupUserResp.UserID)
 			},
 		},
 		{

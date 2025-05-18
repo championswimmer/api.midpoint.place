@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
-	"strconv"
 	"strings"
 
 	"github.com/championswimmer/api.midpoint.place/src/config"
@@ -50,7 +49,7 @@ func generateRandomSecret() string {
 	return fmt.Sprintf("%06d", n.Int64()+100000)
 }
 
-func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string) (*dto.GroupResponse, error) {
+func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers bool, includePlaces bool) (*dto.GroupResponse, error) {
 	var group models.Group
 
 	// Check if input is valid UUID or 10-char alphanumeric code
@@ -75,6 +74,13 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string) (*dto.GroupR
 		query = query.Where("code = ?", groupIDorCode)
 	}
 
+	if includeUsers {
+		query = query.Preload("Users")
+	}
+	if includePlaces {
+		query = query.Preload("Places")
+	}
+
 	if err := query.First(&group).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
 	}
@@ -84,12 +90,37 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string) (*dto.GroupR
 		Name:              group.Name,
 		Type:              group.Type,
 		Code:              group.Code,
-		CreatorID:         strconv.FormatUint(uint64(group.CreatorID), 10),
+		CreatorID:         group.CreatorID,
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
 		Radius:            group.Radius,
 	}
 
+	if includeUsers {
+		groupResponse.Members = lo.Map(group.Members, func(member models.GroupUser, _ int) dto.GroupUserResponse {
+			return dto.GroupUserResponse{
+				UserID:    member.UserID,
+				GroupID:   member.GroupID,
+				Latitude:  member.Latitude,
+				Longitude: member.Longitude,
+				Role:      member.Role,
+			}
+		})
+	}
+	if includePlaces {
+		groupResponse.Places = lo.Map(group.Places, func(place models.GroupPlace, _ int) dto.GroupPlaceResponse {
+			return dto.GroupPlaceResponse{
+				PlaceID:  place.PlaceId,
+				GroupID:  place.GroupId,
+				Name:     place.Name,
+				Address:  place.Address,
+				Type:     place.Type,
+				Rating:   place.Rating,
+				MapURI:   place.MapURI,
+				Latitude: place.Latitude,
+			}
+		})
+	}
 	return groupResponse, nil
 }
 
@@ -133,7 +164,7 @@ func (c *GroupsController) CreateGroup(creatorID uint, req *dto.CreateGroupReque
 		Name:              group.Name,
 		Type:              group.Type,
 		Code:              group.Code,
-		CreatorID:         strconv.FormatUint(uint64(group.CreatorID), 10),
+		CreatorID:         group.CreatorID,
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
 		Radius:            group.Radius,
@@ -169,7 +200,7 @@ func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupReque
 		Name:              group.Name,
 		Type:              group.Type,
 		Code:              group.Code,
-		CreatorID:         strconv.FormatUint(uint64(group.CreatorID), 10),
+		CreatorID:         group.CreatorID,
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
 		Radius:            group.Radius,
@@ -193,7 +224,7 @@ func (c *GroupsController) UpdateGroupMidpoint(groupID string, req *dto.UpdateGr
 		Name:              group.Name,
 		Type:              group.Type,
 		Code:              group.Code,
-		CreatorID:         strconv.FormatUint(uint64(group.CreatorID), 10),
+		CreatorID:         group.CreatorID,
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
 		Radius:            group.Radius,

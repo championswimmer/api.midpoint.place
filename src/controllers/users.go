@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"strconv"
-
 	"github.com/championswimmer/api.midpoint.place/src/db"
 	"github.com/championswimmer/api.midpoint.place/src/db/models"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
@@ -42,7 +40,7 @@ func (c *UsersController) CreateUser(req *dto.CreateUserRequest) (*dto.UserRespo
 	token := security.CreateJWTFromUser(&user)
 
 	return &dto.UserResponse{
-		Id:       strconv.FormatUint(uint64(user.ID), 10),
+		ID:       user.ID,
 		Username: user.Username,
 		Token:    token,
 		Location: dto.Location{
@@ -74,7 +72,7 @@ func (c *UsersController) LoginUser(req *dto.LoginUserRequest) (*dto.UserRespons
 	token := security.CreateJWTFromUser(&user)
 
 	return &dto.UserResponse{
-		Id:       strconv.FormatUint(uint64(user.ID), 10),
+		ID:       user.ID,
 		Username: user.Username,
 		Token:    token,
 		Location: dto.Location{
@@ -101,7 +99,7 @@ func (c *UsersController) UpdateUserLocation(userID uint, req *dto.UserUpdateReq
 	token := security.CreateJWTFromUser(&user)
 
 	return &dto.UserResponse{
-		Id:       strconv.FormatUint(uint64(user.ID), 10),
+		ID:       user.ID,
 		Username: user.Username,
 		Token:    token,
 		Location: dto.Location{

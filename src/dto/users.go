@@ -12,7 +12,7 @@ type UserUpdateRequest struct {
 }
 
 type UserResponse struct {
-	Id       string   `json:"id"`
+	ID       uint     `json:"id"`
 	Username string   `json:"username"`
 	Token    string   `json:"token"`
 	Location Location `json:"location,omitempty"`

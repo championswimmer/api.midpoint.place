@@ -35,7 +35,7 @@ func TestUsersRoute_LoginUser(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, "testuser111", userResp.Username)
 				assert.NotEmpty(t, userResp.Token)
-				assert.NotEmpty(t, userResp.Id)
+				assert.NotEmpty(t, userResp.ID)
 			},
 		},
 		{

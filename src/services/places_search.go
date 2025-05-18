@@ -32,8 +32,8 @@ func (s *PlaceSearchService) NearbyPlaces(location dto.Location, radius int, pla
 	searchResp, err := s.placesClient.SearchNearby(
 		ctx,
 		&placespb.SearchNearbyRequest{
-			IncludedTypes:  []string{"restaurant"},
-			MaxResultCount: 5,
+			IncludedTypes:  _getIncludedTypes(placeType),
+			MaxResultCount: 3, // TODO: fetch from config
 			LocationRestriction: &placespb.SearchNearbyRequest_LocationRestriction{
 				Type: &placespb.SearchNearbyRequest_LocationRestriction_Circle{
 					Circle: &placespb.Circle{
@@ -52,13 +52,27 @@ func (s *PlaceSearchService) NearbyPlaces(location dto.Location, radius int, pla
 	}
 
 	places := lo.Map(searchResp.Places, func(place *placespb.Place, _ int) dto.Place {
-		return googlePlaceToPlaceDto(place, placeType)
+		return _googlePlaceToPlaceDto(place, placeType)
 	})
 
 	return places, nil
 }
 
-func googlePlaceToPlaceDto(googlePlace *placespb.Place, placeType config.PlaceType) dto.Place {
+func _getIncludedTypes(placeType config.PlaceType) []string {
+	switch placeType {
+	case config.PlaceTypeRestaurant:
+		return []string{"restaurant", "bar_and_grill", "food_court"}
+	case config.PlaceTypeBar:
+		return []string{"bar", "pub"}
+	case config.PlaceTypeCafe:
+		return []string{"cafe", "coffee_shop"}
+	case config.PlaceTypePark:
+		return []string{"park", "garden"}
+	}
+	return []string{}
+}
+
+func _googlePlaceToPlaceDto(googlePlace *placespb.Place, placeType config.PlaceType) dto.Place {
 
 	place := dto.Place{
 		Location: dto.Location{

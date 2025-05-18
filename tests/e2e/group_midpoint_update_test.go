@@ -35,8 +35,8 @@ func TestGroupMidpointUpdate(t *testing.T) {
 			userToken: user1.Token,
 			requestBody: &dto.GroupUserJoinRequest{
 				Location: dto.Location{
-					Latitude:  10.000000,
-					Longitude: 80.000000,
+					Latitude:  51.5051821,
+					Longitude: -0.2160895,
 				},
 			},
 			expectedStatus: fiber.StatusAccepted,
@@ -45,8 +45,8 @@ func TestGroupMidpointUpdate(t *testing.T) {
 				err := json.Unmarshal(body, &response)
 				assert.NoError(t, err)
 				assert.Equal(t, group1.ID, response.ID)
-				assert.Equal(t, 10.000000, response.MidpointLatitude)
-				assert.Equal(t, 80.000000, response.MidpointLongitude)
+				assert.Equal(t, 51.5051821, response.MidpointLatitude)
+				assert.Equal(t, -0.2160895, response.MidpointLongitude)
 			},
 		},
 		{
@@ -55,8 +55,8 @@ func TestGroupMidpointUpdate(t *testing.T) {
 			userToken: user2.Token,
 			requestBody: &dto.GroupUserJoinRequest{
 				Location: dto.Location{
-					Latitude:  20.000000,
-					Longitude: 100.000000,
+					Latitude:  51.4974653,
+					Longitude: -0.1536909,
 				},
 			},
 			expectedStatus: fiber.StatusAccepted,
@@ -65,8 +65,8 @@ func TestGroupMidpointUpdate(t *testing.T) {
 				err := json.Unmarshal(body, &response)
 				assert.NoError(t, err)
 				assert.Equal(t, group1.ID, response.ID)
-				assert.Equal(t, 15.000000, response.MidpointLatitude)
-				assert.Equal(t, 90.000000, response.MidpointLongitude)
+				assert.Equal(t, 51.5013237, response.MidpointLatitude)
+				assert.Equal(t, -0.1848902, response.MidpointLongitude)
 			},
 		},
 	}

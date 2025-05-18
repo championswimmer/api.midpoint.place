@@ -18,6 +18,18 @@ definitions:
     x-enum-varnames:
     - GroupUserAdmin
     - GroupUserMember
+  config.PlaceType:
+    enum:
+    - restaurant
+    - bar
+    - cafe
+    - park
+    type: string
+    x-enum-varnames:
+    - PlaceTypeRestaurant
+    - PlaceTypeBar
+    - PlaceTypeCafe
+    - PlaceTypePark
   dto.CreateGroupRequest:
     properties:
       name:
@@ -53,20 +65,51 @@ definitions:
         example: 400
         type: integer
     type: object
+  dto.GroupPlaceResponse:
+    properties:
+      address:
+        type: string
+      group_id:
+        type: string
+      id:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      map_uri:
+        type: string
+      name:
+        type: string
+      place_id:
+        type: string
+      rating:
+        type: number
+      type:
+        $ref: '#/definitions/config.PlaceType'
+    type: object
   dto.GroupResponse:
     properties:
       code:
         type: string
       creator_id:
-        type: string
+        type: integer
       id:
         type: string
+      members:
+        items:
+          $ref: '#/definitions/dto.GroupUserResponse'
+        type: array
       midpoint_latitude:
         type: number
       midpoint_longitude:
         type: number
       name:
         type: string
+      places:
+        items:
+          $ref: '#/definitions/dto.GroupPlaceResponse'
+        type: array
       radius:
         type: integer
       type:
@@ -93,7 +136,7 @@ definitions:
       role:
         $ref: '#/definitions/config.GroupUserRole'
       user_id:
-        type: string
+        type: integer
     type: object
   dto.Location:
     properties:
@@ -132,7 +175,7 @@ definitions:
   dto.UserResponse:
     properties:
       id:
-        type: string
+        type: integer
       location:
         $ref: '#/definitions/dto.Location'
       token:
@@ -181,19 +224,19 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Group created successfully
           schema:
             $ref: '#/definitions/dto.GroupResponse'
         "400":
-          description: Bad Request
+          description: Invalid request
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "422":
-          description: Unprocessable Entity
+          description: Group info validation failed
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Failed to create group
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       security:
@@ -211,6 +254,10 @@ paths:
         name: groupIdOrCode
         required: true
         type: string
+      - description: Include Users
+        in: query
+        name: includeUsers
+        type: boolean
       produces:
       - application/json
       responses:
@@ -219,15 +266,15 @@ paths:
           schema:
             $ref: '#/definitions/dto.GroupResponse'
         "400":
-          description: Bad Request
+          description: Invalid request
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Group not found
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Failed to get group
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       security:
@@ -256,23 +303,23 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Group updated successfully
           schema:
             $ref: '#/definitions/dto.GroupResponse'
         "400":
-          description: Bad Request
+          description: Invalid request
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Group not found
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "422":
-          description: Unprocessable Entity
+          description: Group info validation failed
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Failed to update group
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       security:
@@ -298,15 +345,15 @@ paths:
           schema:
             $ref: '#/definitions/dto.GroupUserResponse'
         "400":
-          description: Bad Request
+          description: Invalid request
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Group not found
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Failed to leave group
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       security:
@@ -337,15 +384,15 @@ paths:
           schema:
             $ref: '#/definitions/dto.GroupUserResponse'
         "400":
-          description: Bad Request
+          description: Invalid request
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Group not found
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Failed to join group
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       security:
@@ -370,15 +417,15 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: User created successfully
           schema:
             $ref: '#/definitions/dto.UserResponse'
         "400":
-          description: Bad Request
+          description: Invalid request
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "409":
-          description: Conflict
+          description: Username already exists
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Register a new user
@@ -446,7 +493,7 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: User added to waitlist successfully
           schema:
             $ref: '#/definitions/dto.WaitlistSignupResponse'
         "400":

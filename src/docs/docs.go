@@ -47,25 +47,25 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "Group created successfully",
                         "schema": {
                             "$ref": "#/definitions/dto.GroupResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid request",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "422": {
-                        "description": "Unprocessable Entity",
+                        "description": "Group info validation failed",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Failed to create group",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -96,6 +96,12 @@ const docTemplate = `{
                         "name": "groupIdOrCode",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Include Users",
+                        "name": "includeUsers",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -106,19 +112,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid request",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Group not found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Failed to get group",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -163,31 +169,31 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Group updated successfully",
                         "schema": {
                             "$ref": "#/definitions/dto.GroupResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid request",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Group not found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "422": {
-                        "description": "Unprocessable Entity",
+                        "description": "Group info validation failed",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Failed to update group",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -237,19 +243,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid request",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Group not found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Failed to join group",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -288,19 +294,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid request",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Group not found",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Failed to leave group",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -335,19 +341,19 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "User created successfully",
                         "schema": {
                             "$ref": "#/definitions/dto.UserResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid request",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "409": {
-                        "description": "Conflict",
+                        "description": "Username already exists",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -450,7 +456,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "User added to waitlist successfully",
                         "schema": {
                             "$ref": "#/definitions/dto.WaitlistSignupResponse"
                         }
@@ -500,6 +506,21 @@ const docTemplate = `{
             "x-enum-varnames": [
                 "GroupUserAdmin",
                 "GroupUserMember"
+            ]
+        },
+        "config.PlaceType": {
+            "type": "string",
+            "enum": [
+                "restaurant",
+                "bar",
+                "cafe",
+                "park"
+            ],
+            "x-enum-varnames": [
+                "PlaceTypeRestaurant",
+                "PlaceTypeBar",
+                "PlaceTypeCafe",
+                "PlaceTypePark"
             ]
         },
         "dto.CreateGroupRequest": {
@@ -556,6 +577,41 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.GroupPlaceResponse": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "group_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "map_uri": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "place_id": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "type": {
+                    "$ref": "#/definitions/config.PlaceType"
+                }
+            }
+        },
         "dto.GroupResponse": {
             "type": "object",
             "properties": {
@@ -563,10 +619,16 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "creator_id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "id": {
                     "type": "string"
+                },
+                "members": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GroupUserResponse"
+                    }
                 },
                 "midpoint_latitude": {
                     "type": "number"
@@ -576,6 +638,12 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "places": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GroupPlaceResponse"
+                    }
                 },
                 "radius": {
                     "type": "integer"
@@ -616,7 +684,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/config.GroupUserRole"
                 },
                 "user_id": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         },
@@ -677,7 +745,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "location": {
                     "$ref": "#/definitions/dto.Location"

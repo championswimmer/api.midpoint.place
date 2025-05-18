@@ -8,16 +8,21 @@ import (
 	"github.com/championswimmer/api.midpoint.place/src/security"
 	"github.com/championswimmer/api.midpoint.place/src/server/parsers"
 	"github.com/championswimmer/api.midpoint.place/src/server/validators"
+	"github.com/championswimmer/api.midpoint.place/src/services"
 	"github.com/championswimmer/api.midpoint.place/src/utils/applogger"
 	"github.com/gofiber/fiber/v2"
 )
 
 var groupsController *controllers.GroupsController
 var groupUsersController *controllers.GroupUsersController
+var groupPlacesController *controllers.GroupPlacesController
+var placesSearchService *services.PlaceSearchService
 
 func GroupsRoute() func(router fiber.Router) {
 	groupsController = controllers.CreateGroupsController()
 	groupUsersController = controllers.CreateGroupUsersController()
+	groupPlacesController = controllers.CreateGroupPlacesController()
+	placesSearchService = services.NewPlaceSearchService()
 
 	return func(router fiber.Router) {
 		router.Post("/", security.MandatoryJwtAuthMiddleware, createGroup)
@@ -135,12 +140,7 @@ func joinGroup(ctx *fiber.Ctx) error {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
 
-	go func() {
-		err := _recalculateGroupMidpoint(group.ID)
-		if err != nil {
-			applogger.Error("Error recalculating group location", err)
-		}
-	}()
+	go _triggerGroupMidpointUpdate(group)
 
 	return ctx.Status(fiber.StatusAccepted).JSON(groupUserResp)
 }
@@ -170,6 +170,8 @@ func leaveGroup(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
+
+	go _triggerGroupMidpointUpdate(group)
 	return ctx.Status(fiber.StatusAccepted).JSON([]byte("{}"))
 }
 
@@ -198,6 +200,35 @@ func getGroup(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(group)
 }
 
+// side effects:
+// 1. recalculate group midpoint
+// 2. delete existing group places
+// 3. populate group places (parallelly) for all place types
+func _triggerGroupMidpointUpdate(group *dto.GroupResponse) {
+	err := _recalculateGroupMidpoint(group.ID)
+	if err != nil {
+		applogger.Error("Error recalculating group location", err)
+	}
+	err = _deleteExistingGroupPlaces(group.ID)
+	if err != nil {
+		applogger.Error("Error deleting existing group places", err)
+	}
+	placeTypes := []config.PlaceType{
+		config.PlaceTypeRestaurant,
+		config.PlaceTypeBar,
+		config.PlaceTypeCafe,
+		config.PlaceTypePark,
+	}
+	for _, placeType := range placeTypes {
+		go func(placeType config.PlaceType) {
+			err := _populateGroupPlaces(group, placeType)
+			if err != nil {
+				applogger.Error("Error populating group places", err)
+			}
+		}(placeType)
+	}
+}
+
 func _recalculateGroupMidpoint(groupID string) error {
 	applogger.Info("Recalculating group midpoint for group", groupID)
 	centroidLatitude, centroidLongitude, err := groupUsersController.CalculateGroupCentroid(groupID)
@@ -215,5 +246,36 @@ func _recalculateGroupMidpoint(groupID string) error {
 		return err
 	}
 
+	return nil
+}
+
+func _deleteExistingGroupPlaces(groupID string) error {
+	applogger.Warn("Deleting existing group places for group", groupID)
+	err := groupPlacesController.RemoveAllPlacesFromGroup(groupID)
+	if err != nil {
+		return err
+	}
+	applogger.Warn("Deleted existing group places for group", groupID)
+	return nil
+}
+
+func _populateGroupPlaces(group *dto.GroupResponse, placeType config.PlaceType) error {
+	applogger.Info("Populating group places for group", group.ID, "with type", placeType)
+	location := dto.Location{
+		Latitude:  group.MidpointLatitude,
+		Longitude: group.MidpointLongitude,
+	}
+
+	places, err := placesSearchService.NearbyPlaces(location, group.Radius, placeType)
+	if err != nil {
+		return err
+	}
+	groupPlacesAddRequest := &dto.GroupPlacesAddRequest{
+		Places: places,
+	}
+	_, err = groupPlacesController.AddPlacesToGroup(group.ID, groupPlacesAddRequest)
+	if err != nil {
+		return err
+	}
 	return nil
 }

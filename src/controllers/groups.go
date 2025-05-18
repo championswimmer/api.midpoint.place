@@ -75,7 +75,7 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 	}
 
 	if includeUsers {
-		query = query.Preload("Users")
+		query = query.Preload("Members")
 	}
 	if includePlaces {
 		query = query.Preload("Places")

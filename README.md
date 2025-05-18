@@ -11,6 +11,8 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Swagger 2.0](https://img.shields.io/badge/Swagger-2.0-85EA2D?style=flat&logo=swagger)](https://swagger.io/)
 
+[![API Docs](https://img.shields.io/badge/API_Docs-000000?style=for-the-badge&logo=swagger&logoColor=white)](https://api.midpoint.place/docs)
+
 
 ## Project Description
 

@@ -41,7 +41,8 @@ func TestGroupsRoute_CreateGroup(t *testing.T) {
 				assert.Equal(t, "Test Group", groupResp.Name)
 				assert.Equal(t, config.GroupTypePublic, groupResp.Type)
 				assert.Equal(t, 1200, groupResp.Radius)
-				assert.Equal(t, createdUser.ID, groupResp.CreatorID)
+				assert.Equal(t, createdUser.ID, groupResp.Creator.ID)
+				assert.Equal(t, createdUser.Username, groupResp.Creator.Username)
 				createdGroup = groupResp
 			},
 		},

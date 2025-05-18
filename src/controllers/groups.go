@@ -67,7 +67,7 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 		return nil, fiber.NewError(fiber.StatusUnprocessableEntity, "Invalid group ID or code")
 	}
 
-	query := c.db
+	query := c.db.Preload("Creator") // Always preload creator
 	if isValidUUID {
 		query = query.Where("id = ?", groupIDorCode)
 	} else {
@@ -86,11 +86,14 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 	}
 
 	groupResponse := &dto.GroupResponse{
-		ID:                group.ID,
-		Name:              group.Name,
-		Type:              group.Type,
-		Code:              group.Code,
-		CreatorID:         group.CreatorID,
+		ID:   group.ID,
+		Name: group.Name,
+		Type: group.Type,
+		Code: group.Code,
+		Creator: dto.GroupCreator{
+			ID:       group.Creator.ID,
+			Username: group.Creator.Username,
+		},
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
 		Radius:            group.Radius,
@@ -159,12 +162,21 @@ func (c *GroupsController) CreateGroup(creatorID uint, req *dto.CreateGroupReque
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to create group")
 	}
 
+	// Fetch the creator information
+	var creator models.User
+	if err := c.db.First(&creator, creatorID).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch creator information")
+	}
+
 	return &dto.GroupResponse{
-		ID:                group.ID,
-		Name:              group.Name,
-		Type:              group.Type,
-		Code:              group.Code,
-		CreatorID:         group.CreatorID,
+		ID:   group.ID,
+		Name: group.Name,
+		Type: group.Type,
+		Code: group.Code,
+		Creator: dto.GroupCreator{
+			ID:       creator.ID,
+			Username: creator.Username,
+		},
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
 		Radius:            group.Radius,
@@ -173,7 +185,7 @@ func (c *GroupsController) CreateGroup(creatorID uint, req *dto.CreateGroupReque
 
 func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupRequest) (*dto.GroupResponse, error) {
 	var group models.Group
-	if err := c.db.Where("id = ?", groupID).First(&group).Error; err != nil {
+	if err := c.db.Preload("Creator").Where("id = ?", groupID).First(&group).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
 	}
 
@@ -196,11 +208,14 @@ func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupReque
 	}
 
 	return &dto.GroupResponse{
-		ID:                group.ID,
-		Name:              group.Name,
-		Type:              group.Type,
-		Code:              group.Code,
-		CreatorID:         group.CreatorID,
+		ID:   group.ID,
+		Name: group.Name,
+		Type: group.Type,
+		Code: group.Code,
+		Creator: dto.GroupCreator{
+			ID:       group.Creator.ID,
+			Username: group.Creator.Username,
+		},
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
 		Radius:            group.Radius,
@@ -209,7 +224,7 @@ func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupReque
 
 func (c *GroupsController) UpdateGroupMidpoint(groupID string, req *dto.UpdateGroupMidpointRequest) (*dto.GroupResponse, error) {
 	var group models.Group
-	if err := c.db.Where("id = ?", groupID).First(&group).Error; err != nil {
+	if err := c.db.Preload("Creator").Where("id = ?", groupID).First(&group).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
 	}
 
@@ -220,11 +235,14 @@ func (c *GroupsController) UpdateGroupMidpoint(groupID string, req *dto.UpdateGr
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to update group location")
 	}
 	return &dto.GroupResponse{
-		ID:                group.ID,
-		Name:              group.Name,
-		Type:              group.Type,
-		Code:              group.Code,
-		CreatorID:         group.CreatorID,
+		ID:   group.ID,
+		Name: group.Name,
+		Type: group.Type,
+		Code: group.Code,
+		Creator: dto.GroupCreator{
+			ID:       group.Creator.ID,
+			Username: group.Creator.Username,
+		},
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
 		Radius:            group.Radius,

@@ -128,5 +128,5 @@ func TestGroupsRoute_AddUsersToGroupAndVerify(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Len(t, groupResp.Members, 1)
-	assert.Equal(t, user2.Id, groupResp.Members[0].UserID)
+	assert.Equal(t, user2.ID, groupResp.Members[0].UserID)
 }

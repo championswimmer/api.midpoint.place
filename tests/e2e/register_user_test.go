@@ -38,5 +38,5 @@ func TestUsersRoute_RegisterUser(t *testing.T) {
 
 	assert.Equal(t, "testuser125", response.Username)
 	assert.NotEmpty(t, response.Token)
-	assert.NotEmpty(t, response.Id)
+	assert.NotEmpty(t, response.ID)
 }

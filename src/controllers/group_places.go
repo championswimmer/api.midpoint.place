@@ -63,7 +63,7 @@ func (c *GroupPlacesController) AddPlacesToGroup(groupID string, req *dto.GroupP
 				PlaceId:   place.Id,
 				Name:      place.Name,
 				Address:   place.Address,
-				Type:      string(place.Type),
+				Type:      place.Type,
 				Rating:    place.Rating,
 				MapURI:    place.MapURI,
 				Latitude:  place.Latitude,

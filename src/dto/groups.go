@@ -25,9 +25,10 @@ type GroupResponse struct {
 	Name              string               `json:"name"`
 	Type              config.GroupType     `json:"type"`
 	Code              string               `json:"code"`
-	CreatorID         string               `json:"creator_id"`
+	CreatorID         uint                 `json:"creator_id"`
 	MidpointLatitude  float64              `json:"midpoint_latitude"`
 	MidpointLongitude float64              `json:"midpoint_longitude"`
 	Radius            int                  `json:"radius"`
 	Members           []GroupUserResponse  `json:"members,omitempty"`
+	Places            []GroupPlaceResponse `json:"places,omitempty"`
 }

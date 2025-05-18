@@ -248,3 +248,63 @@ func (c *GroupsController) UpdateGroupMidpoint(groupID string, req *dto.UpdateGr
 		Radius:            group.Radius,
 	}, nil
 }
+
+func (c *GroupsController) GetGroupsByCreator(creatorID uint) ([]dto.GroupResponse, error) {
+	var groups []models.Group
+
+	// Fetch all groups created by the user, preload creator info
+	if err := c.db.Preload("Creator").Where("creator_id = ?", creatorID).Find(&groups).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch groups")
+	}
+
+	// Convert to response DTOs
+	groupResponses := make([]dto.GroupResponse, len(groups))
+	for i, group := range groups {
+		groupResponses[i] = dto.GroupResponse{
+			ID:   group.ID,
+			Name: group.Name,
+			Type: group.Type,
+			Code: group.Code,
+			Creator: dto.GroupCreator{
+				ID:       group.Creator.ID,
+				Username: group.Creator.Username,
+			},
+			MidpointLatitude:  group.MidpointLatitude,
+			MidpointLongitude: group.MidpointLongitude,
+			Radius:            group.Radius,
+		}
+	}
+
+	return groupResponses, nil
+}
+
+func (c *GroupsController) GetPublicGroups(limit int) ([]dto.GroupResponse, error) {
+	var groups []models.Group
+
+	if err := c.db.Preload("Creator").
+		Where("type = ?", config.GroupTypePublic).
+		Order("created_at desc").
+		Limit(limit).
+		Find(&groups).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch public groups")
+	}
+
+	// Convert to response DTOs
+	groupResponses := lo.Map(groups, func(group models.Group, _ int) dto.GroupResponse {
+		return dto.GroupResponse{
+			ID:   group.ID,
+			Name: group.Name,
+			Type: group.Type,
+			Code: group.Code,
+			Creator: dto.GroupCreator{
+				ID:       group.Creator.ID,
+				Username: group.Creator.Username,
+			},
+			MidpointLatitude:  group.MidpointLatitude,
+			MidpointLongitude: group.MidpointLongitude,
+			Radius:            group.Radius,
+		}
+	})
+
+	return groupResponses, nil
+}

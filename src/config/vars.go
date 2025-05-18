@@ -20,6 +20,8 @@ var JWTExpirationDays int
 
 var GoogleMapsAPIKey string
 
+var GroupsQueryLimit int
+
 // should run after env.go#init as this `vars` is alphabetically after `env`
 func init() {
 	Env, _ = lo.Coalesce(
@@ -39,7 +41,9 @@ func init() {
 	Port = os.Getenv("PORT")
 
 	JWTSigningKey = os.Getenv("JWT_SIGNING_KEY")
-	JWTExpirationDays, _ = strconv.Atoi(os.Getenv("JWT_EXPIRATION_DAYS"))
+	JWTExpirationDays = lo.Must(strconv.Atoi(os.Getenv("JWT_EXPIRATION_DAYS")))
 
 	GoogleMapsAPIKey = os.Getenv("GOOGLE_MAPS_API_KEY")
+
+	GroupsQueryLimit = lo.Must(strconv.Atoi(os.Getenv("GROUPS_QUERY_LIMIT")))
 }

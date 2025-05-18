@@ -25,12 +25,31 @@ func GroupsRoute() func(router fiber.Router) {
 	placesSearchService = services.NewPlaceSearchService()
 
 	return func(router fiber.Router) {
+		router.Get("/", security.MandatoryJwtAuthMiddleware, listPublicGroups)
 		router.Post("/", security.MandatoryJwtAuthMiddleware, createGroup)
 		router.Get("/:groupIdOrCode", security.MandatoryJwtAuthMiddleware, getGroup)
-		router.Patch("/:groupIdOrCode", security.MandatoryJwtAuthMiddleware, updateGroup) // Assuming PATCH for partial updates
+		router.Patch("/:groupIdOrCode", security.MandatoryJwtAuthMiddleware, updateGroup)
 		router.Put("/:groupIdOrCode/join", security.MandatoryJwtAuthMiddleware, joinGroup)
 		router.Delete("/:groupIdOrCode/join", security.MandatoryJwtAuthMiddleware, leaveGroup)
 	}
+}
+
+// @Summary List public groups
+// @Description Get a list of all public groups, ordered by creation date (newest first), limited to 100 results
+// @Tags groups
+// @ID list-public-groups
+// @Produce json
+// @Success 200 {array} dto.GroupResponse "List of public groups"
+// @Failure 500 {object} dto.ErrorResponse "Failed to fetch groups"
+// @Router /groups [get]
+// @Security BearerAuth
+func listPublicGroups(ctx *fiber.Ctx) error {
+	groups, err := groupsController.GetPublicGroups(config.GroupsQueryLimit)
+	if err != nil {
+		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(groups)
 }
 
 // @Summary Create a new group

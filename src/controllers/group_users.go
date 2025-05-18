@@ -6,6 +6,7 @@ import (
 	"github.com/championswimmer/api.midpoint.place/src/dto"
 	"github.com/championswimmer/api.midpoint.place/src/utils/applogger"
 	"github.com/gofiber/fiber/v2"
+	"github.com/samber/lo"
 	"gorm.io/gorm"
 )
 
@@ -171,6 +172,74 @@ func (c *GroupUsersController) GetGroupMembers(groupID string) ([]dto.GroupUserR
 			GroupID:   groupUser.GroupID,
 			Latitude:  groupUser.Latitude,
 			Longitude: groupUser.Longitude,
+		}
+	}
+
+	return response, nil
+}
+
+// GetGroupContainingMember returns all groups that contain the specified user as a member
+func (c *GroupUsersController) GetGroupsContainingMember(userID uint) ([]dto.GroupResponse, error) {
+	// Check if user exists
+	var user models.User
+	if err := c.db.First(&user, userID).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusNotFound, "User not found")
+	}
+
+	// Get all groups where the user is a member
+	var groupUsers []models.GroupUser
+	if err := c.db.Where("user_id = ?", userID).Find(&groupUsers).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch user's groups")
+	}
+
+	// If user is not a member of any groups, return empty array
+	if len(groupUsers) == 0 {
+		return []dto.GroupResponse{}, nil
+	}
+
+	// Get all group IDs
+	groupIDs := make([]string, len(groupUsers))
+	for i, gu := range groupUsers {
+		groupIDs[i] = gu.GroupID
+	}
+
+	// Fetch all groups with their creators and members
+	var groups []models.Group
+	if err := c.db.Preload("Creator").
+		Preload("Members").
+		Preload("Members.User").
+		Where("id IN ?", groupIDs).
+		Find(&groups).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch groups details")
+	}
+
+	// Convert to response DTOs
+	response := make([]dto.GroupResponse, len(groups))
+	for i, group := range groups {
+		// Convert members to GroupUserResponse
+		members := lo.Map(group.Members, func(member models.GroupUser, _ int) dto.GroupUserResponse {
+			return dto.GroupUserResponse{
+				UserID:    member.UserID,
+				GroupID:   member.GroupID,
+				Latitude:  member.Latitude,
+				Longitude: member.Longitude,
+				Role:      member.Role,
+			}
+		})
+
+		response[i] = dto.GroupResponse{
+			ID:   group.ID,
+			Name: group.Name,
+			Type: group.Type,
+			Code: group.Code,
+			Creator: dto.GroupCreator{
+				ID:       group.Creator.ID,
+				Username: group.Creator.Username,
+			},
+			MidpointLatitude:  group.MidpointLatitude,
+			MidpointLongitude: group.MidpointLongitude,
+			Radius:            group.Radius,
+			Members:           members,
 		}
 	}
 

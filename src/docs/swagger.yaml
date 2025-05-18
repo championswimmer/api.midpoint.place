@@ -65,6 +65,13 @@ definitions:
         example: 400
         type: integer
     type: object
+  dto.GroupCreator:
+    properties:
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
   dto.GroupPlaceResponse:
     properties:
       address:
@@ -92,8 +99,8 @@ definitions:
     properties:
       code:
         type: string
-      creator_id:
-        type: integer
+      creator:
+        $ref: '#/definitions/dto.GroupCreator'
       id:
         type: string
       members:
@@ -208,6 +215,37 @@ info:
   version: "1.0"
 paths:
   /groups:
+    get:
+      description: Get a list of all public groups, ordered by creation date (newest
+        first), limited to 100 results
+      operationId: list-public-groups
+      parameters:
+      - description: Filter groups - 'creator' for groups created by user, 'member'
+          for groups user belongs to
+        enum:
+        - creator
+        - member
+        in: query
+        name: self
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of public groups
+          schema:
+            items:
+              $ref: '#/definitions/dto.GroupResponse'
+            type: array
+        "500":
+          description: Failed to fetch groups
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List public groups
+      tags:
+      - groups
     post:
       consumes:
       - application/json

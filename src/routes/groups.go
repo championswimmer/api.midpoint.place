@@ -39,12 +39,27 @@ func GroupsRoute() func(router fiber.Router) {
 // @Tags groups
 // @ID list-public-groups
 // @Produce json
+// @Param self query string false "Filter groups - 'creator' for groups created by user, 'member' for groups user belongs to" Enums(creator,member)
 // @Success 200 {array} dto.GroupResponse "List of public groups"
 // @Failure 500 {object} dto.ErrorResponse "Failed to fetch groups"
 // @Router /groups [get]
 // @Security BearerAuth
 func listPublicGroups(ctx *fiber.Ctx) error {
-	groups, err := groupsController.GetPublicGroups(config.GroupsQueryLimit)
+	selfQuery := ctx.Query("self")
+	user := ctx.Locals(config.LOCALS_USER).(*models.User)
+
+	var groups []dto.GroupResponse
+	var err error
+
+	switch selfQuery {
+	case "creator":
+		groups, err = groupsController.GetGroupsByCreator(user.ID)
+	case "member":
+		groups, err = groupUsersController.GetGroupsContainingMember(user.ID)
+	default:
+		groups, err = groupsController.GetPublicGroups(config.GroupsQueryLimit)
+	}
+
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}

@@ -23,7 +23,7 @@ func CreateGroupPlacesController() *GroupPlacesController {
 }
 
 // AddPlacesToGroup adds an array of places to a group
-// If a place with the same PlaceId already exists for this group, it will be ignored
+// If a place with the same PlaceID already exists for this group, it will be ignored
 func (c *GroupPlacesController) AddPlacesToGroup(groupID string, req *dto.GroupPlacesAddRequest) ([]dto.GroupPlaceResponse, error) {
 	// Check if group exists
 	var group models.Group
@@ -59,8 +59,8 @@ func (c *GroupPlacesController) AddPlacesToGroup(groupID string, req *dto.GroupP
 			// Add place to batch
 			groupPlace := models.GroupPlace{
 				ID:        uuid.New(),
-				GroupId:   groupID,
-				PlaceId:   place.Id,
+				GroupID:   groupID,
+				PlaceID:   place.Id,
 				Name:      place.Name,
 				Address:   place.Address,
 				Type:      place.Type,
@@ -82,8 +82,8 @@ func (c *GroupPlacesController) AddPlacesToGroup(groupID string, req *dto.GroupP
 			for _, groupPlace := range newPlaces {
 				responses = append(responses, dto.GroupPlaceResponse{
 					ID:        groupPlace.ID.String(),
-					GroupID:   groupPlace.GroupId,
-					PlaceID:   groupPlace.PlaceId,
+					GroupID:   groupPlace.GroupID,
+					PlaceID:   groupPlace.PlaceID,
 					Name:      groupPlace.Name,
 					Address:   groupPlace.Address,
 					Type:      config.PlaceType(groupPlace.Type),
@@ -137,8 +137,8 @@ func (c *GroupPlacesController) GetGroupPlaces(groupID string) ([]dto.GroupPlace
 	for i, place := range groupPlaces {
 		responses[i] = dto.GroupPlaceResponse{
 			ID:        place.ID.String(),
-			GroupID:   place.GroupId,
-			PlaceID:   place.PlaceId,
+			GroupID:   place.GroupID,
+			PlaceID:   place.PlaceID,
 			Name:      place.Name,
 			Address:   place.Address,
 			Type:      config.PlaceType(place.Type),

@@ -28,7 +28,7 @@ type Group struct {
 	MidpointLongitude float64          `gorm:"type:decimal(11,8);not null;default:0"`
 	// Radius in meters
 	Radius  int          `gorm:"type:integer;not null;default:2000"`
-	Places  []GroupPlace `gorm:"foreignKey:GroupId"`
+	Places  []GroupPlace `gorm:"foreignKey:GroupID"`
 	Members []GroupUser  `gorm:"foreignKey:GroupID"`
 }
 

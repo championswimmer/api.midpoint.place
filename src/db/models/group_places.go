@@ -10,9 +10,9 @@ import (
 type GroupPlace struct {
 	gorm.Model
 	ID        uuid.UUID        `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
-	GroupId   string           `gorm:"not null;uniqueIndex:idx_group_place"`
-	PlaceId   string           `gorm:"not null;uniqueIndex:idx_group_place"`
-	Group     Group            `gorm:"foreignKey:GroupId"`
+	GroupID   string           `gorm:"not null;uniqueIndex:idx_group_place"`
+	PlaceID   string           `gorm:"not null;uniqueIndex:idx_group_place"`
+	Group     Group            `gorm:"foreignKey:GroupID"`
 	Name      string           `gorm:"not null"`
 	Address   string           `gorm:"not null"`
 	Type      config.PlaceType `gorm:"not null"`

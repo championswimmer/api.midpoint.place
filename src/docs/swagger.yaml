@@ -296,6 +296,10 @@ paths:
         in: query
         name: includeUsers
         type: boolean
+      - description: Include Places
+        in: query
+        name: includePlaces
+        type: boolean
       produces:
       - application/json
       responses:

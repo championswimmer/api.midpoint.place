@@ -147,6 +147,12 @@ const docTemplate = `{
                         "description": "Include Users",
                         "name": "includeUsers",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Include Places",
+                        "name": "includePlaces",
+                        "in": "query"
                     }
                 ],
                 "responses": {

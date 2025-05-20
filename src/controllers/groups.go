@@ -76,10 +76,10 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 	}
 
 	if includeUsers {
-		query = query.Preload("Members")
+		query = query.Preload("Members").Joins("LEFT JOIN group_users ON groups.id = group_users.group_id")
 	}
 	if includePlaces {
-		query = query.Preload("Places")
+		query = query.Preload("Places").Joins("LEFT JOIN group_places ON groups.id = group_places.group_id")
 	}
 
 	if err := query.First(&group).Error; err != nil {

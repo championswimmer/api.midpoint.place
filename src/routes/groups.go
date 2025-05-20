@@ -216,6 +216,7 @@ func leaveGroup(ctx *fiber.Ctx) error {
 // @Produce json
 // @Param groupIdOrCode path string true "Group ID or Code"
 // @Param includeUsers query bool false "Include Users"
+// @Param includePlaces query bool false "Include Places"
 // @Success 200 {object} dto.GroupResponse
 // @Failure 400 {object} dto.ErrorResponse "Invalid request"
 // @Failure 404 {object} dto.ErrorResponse "Group not found"
@@ -225,8 +226,9 @@ func leaveGroup(ctx *fiber.Ctx) error {
 func getGroup(ctx *fiber.Ctx) error {
 	groupIDOrCode := ctx.Params("groupIdOrCode")
 	includeUsers := ctx.QueryBool("includeUsers", false)
+	includePlaces := ctx.QueryBool("includePlaces", false)
 
-	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode, includeUsers, false)
+	group, err := groupsController.GetGroupByIDorCode(groupIDOrCode, includeUsers, includePlaces)
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}

@@ -114,14 +114,15 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 	if includePlaces {
 		groupResponse.Places = lo.Map(group.Places, func(place models.GroupPlace, _ int) dto.GroupPlaceResponse {
 			return dto.GroupPlaceResponse{
-				PlaceID:  place.PlaceID,
-				GroupID:  place.GroupID,
-				Name:     place.Name,
-				Address:  place.Address,
-				Type:     place.Type,
-				Rating:   place.Rating,
-				MapURI:   place.MapURI,
-				Latitude: place.Latitude,
+				PlaceID:   place.PlaceID,
+				GroupID:   place.GroupID,
+				Name:      place.Name,
+				Address:   place.Address,
+				Type:      place.Type,
+				Rating:    place.Rating,
+				MapURI:    place.MapURI,
+				Latitude:  place.Latitude,
+				Longitude: place.Longitude,
 			}
 		})
 	}

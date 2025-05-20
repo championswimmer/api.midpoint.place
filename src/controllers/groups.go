@@ -310,3 +310,34 @@ func (c *GroupsController) GetPublicGroups(limit int) ([]dto.GroupResponse, erro
 
 	return groupResponses, nil
 }
+
+func (c *GroupsController) GetPublicGroupsByCreator(creatorID uint) ([]dto.GroupResponse, error) {
+	var groups []models.Group
+
+	// Fetch all public groups created by the user, preload creator info
+	if err := c.db.Preload("Creator").
+		Where("groups.creator_id = ? AND groups.type = ?", creatorID, config.GroupTypePublic).
+		Find(&groups).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch public groups by creator")
+	}
+
+	// Convert to response DTOs
+	groupResponses := make([]dto.GroupResponse, len(groups))
+	for i, group := range groups {
+		groupResponses[i] = dto.GroupResponse{
+			ID:   group.ID,
+			Name: group.Name,
+			Type: group.Type,
+			Code: group.Code,
+			Creator: dto.GroupCreator{
+				ID:       group.Creator.ID,
+				Username: group.Creator.Username,
+			},
+			MidpointLatitude:  group.MidpointLatitude,
+			MidpointLongitude: group.MidpointLongitude,
+			Radius:            group.Radius,
+		}
+	}
+
+	return groupResponses, nil
+}

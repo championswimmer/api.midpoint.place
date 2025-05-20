@@ -68,18 +68,20 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 		return nil, fiber.NewError(fiber.StatusUnprocessableEntity, "Invalid group ID or code")
 	}
 
-	query := c.db.Preload("Creator") // Always preload creator
-	if isValidUUID {
-		query = query.Where("id = ?", groupIDorCode)
-	} else {
-		query = query.Where("code = ?", groupIDorCode)
-	}
+	// Always preload creator
+	query := c.db.Preload("Creator").Joins("LEFT JOIN users ON groups.creator_id = users.id")
 
 	if includeUsers {
 		query = query.Preload("Members").Joins("LEFT JOIN group_users ON groups.id = group_users.group_id")
 	}
 	if includePlaces {
 		query = query.Preload("Places").Joins("LEFT JOIN group_places ON groups.id = group_places.group_id")
+	}
+
+	if isValidUUID {
+		query = query.Where("groups.id = ?", groupIDorCode)
+	} else {
+		query = query.Where("groups.code = ?", groupIDorCode)
 	}
 
 	if err := query.First(&group).Error; err != nil {

@@ -39,22 +39,32 @@ func (c *GroupUsersController) JoinGroup(groupID string, userID uint, req *dto.G
 
 	// Check if the user is already in the group and update their location if necessary
 	var groupUser models.GroupUser
-	if err := c.db.Where("user_id = ? AND group_id = ?", userID, groupID).FirstOrCreate(&groupUser, models.GroupUser{
-		UserID:    userID,
-		GroupID:   groupID,
-		Latitude:  req.Latitude,
-		Longitude: req.Longitude,
-	}).Error; err != nil {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to add/update user in group")
-	}
-
-	if groupUser.Latitude != req.Latitude || groupUser.Longitude != req.Longitude {
-		groupUser.Latitude = req.Latitude
-		groupUser.Longitude = req.Longitude
-		if err := c.db.Save(&groupUser).Error; err != nil {
-			return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to update user location in group")
+	err := c.db.Transaction(func(tx *gorm.DB) error {
+		applogger.Info("Joining group", groupID, "for user", userID, "transaction started")
+		if err := tx.Where("user_id = ? AND group_id = ?", userID, groupID).FirstOrCreate(&groupUser, models.GroupUser{
+			UserID:    userID,
+			GroupID:   groupID,
+			Latitude:  req.Latitude,
+			Longitude: req.Longitude,
+		}).Error; err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "Failed to add/update user in group")
 		}
-		applogger.Warn("User", userID, "is already in group", groupID, "- updating location")
+
+		// If the user is already in the group and the location has changed, update the location
+		if groupUser.Latitude != req.Latitude || groupUser.Longitude != req.Longitude {
+			groupUser.Latitude = req.Latitude
+			groupUser.Longitude = req.Longitude
+			if err := tx.Save(&groupUser).Error; err != nil {
+				return fiber.NewError(fiber.StatusInternalServerError, "Failed to update user location in group")
+			}
+			applogger.Warn("User", userID, "is already in group", groupID, "- updating location")
+		}
+		applogger.Info("Joining group", groupID, "for user", userID, "transaction completed")
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
 	return &dto.GroupUserResponse{

@@ -96,8 +96,8 @@ func TestGroupsRoute_MembershipOperations(t *testing.T) {
 
 func TestGroupsRoute_AddUsersToGroupAndVerify(t *testing.T) {
 	// Create two users
-	user1 := tests.TestUtil_CreateUser(t, "testuser301", "testpassword301")
-	user2 := tests.TestUtil_CreateUser(t, "testuser401", "testpassword401")
+	user1 := tests.TestUtil_CreateUser(t, "testuser3301", "testpassword3301")
+	user2 := tests.TestUtil_CreateUser(t, "testuser4401", "testpassword4401")
 
 	// Create a group
 	group := tests.TestUtil_CreateGroup(t, user1.Token, "Test Group 3")

@@ -37,39 +37,24 @@ func (c *GroupUsersController) JoinGroup(groupID string, userID uint, req *dto.G
 		return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
 	}
 
-	// Check if the user is already in the group
-	var existingGroupUser models.GroupUser
-	result := c.db.Where("user_id = ? AND group_id = ?", userID, groupID).First(&existingGroupUser)
-
-	if result.Error == nil {
-		// User is already in the group, update their location
-		applogger.Warn("User", userID, "is already in group", groupID, "- updating location")
-
-		existingGroupUser.Latitude = req.Latitude
-		existingGroupUser.Longitude = req.Longitude
-
-		if err := c.db.Save(&existingGroupUser).Error; err != nil {
-			return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to update user location in group")
-		}
-
-		return &dto.GroupUserResponse{
-			UserID:    existingGroupUser.UserID,
-			GroupID:   existingGroupUser.GroupID,
-			Latitude:  existingGroupUser.Latitude,
-			Longitude: existingGroupUser.Longitude,
-		}, nil
-	}
-
-	// Add user to group
-	groupUser := models.GroupUser{
+	// Check if the user is already in the group and update their location if necessary
+	var groupUser models.GroupUser
+	if err := c.db.Where("user_id = ? AND group_id = ?", userID, groupID).FirstOrCreate(&groupUser, models.GroupUser{
 		UserID:    userID,
 		GroupID:   groupID,
 		Latitude:  req.Latitude,
 		Longitude: req.Longitude,
+	}).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to add/update user in group")
 	}
 
-	if err := c.db.Create(&groupUser).Error; err != nil {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to add user to group")
+	if groupUser.Latitude != req.Latitude || groupUser.Longitude != req.Longitude {
+		groupUser.Latitude = req.Latitude
+		groupUser.Longitude = req.Longitude
+		if err := c.db.Save(&groupUser).Error; err != nil {
+			return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to update user location in group")
+		}
+		applogger.Warn("User", userID, "is already in group", groupID, "- updating location")
 	}
 
 	return &dto.GroupUserResponse{
@@ -107,25 +92,18 @@ func (c *GroupUsersController) LeaveGroup(groupID string, userID uint) error {
 }
 
 func (c *GroupUsersController) CalculateGroupCentroid(groupID string) (latitude float64, longitude float64, err error) {
-	groupMembers := []models.GroupUser{}
-
-	if err := c.db.Where("group_id = ?", groupID).Find(&groupMembers).Error; err != nil {
-		return 0, 0, fiber.NewError(fiber.StatusInternalServerError, "Failed to get group members")
+	var result struct {
+		Latitude  float64
+		Longitude float64
+	}
+	if err := c.db.Model(&models.GroupUser{}).
+		Select("AVG(latitude) as Latitude, AVG(longitude) as Longitude").
+		Where("group_id = ?", groupID).
+		Scan(&result).Error; err != nil {
+		return 0, 0, fiber.NewError(fiber.StatusInternalServerError, "Failed to calculate group centroid")
 	}
 
-	totalMembers := len(groupMembers)
-	totalLatitude := 0.0
-	totalLongitude := 0.0
-
-	for _, member := range groupMembers {
-		totalLatitude += member.Latitude
-		totalLongitude += member.Longitude
-	}
-
-	centroidLatitude := totalLatitude / float64(totalMembers)
-	centroidLongitude := totalLongitude / float64(totalMembers)
-
-	return centroidLatitude, centroidLongitude, nil
+	return result.Latitude, result.Longitude, nil
 }
 
 // GroupMembershipCheck checks if a user belongs to a specified group
@@ -150,17 +128,7 @@ func (c *GroupUsersController) GroupMembershipCheck(groupID string, userID uint)
 // GetGroupMembers fetches all members of a group
 // Returns a slice of GroupUserResponse for all users in the group
 func (c *GroupUsersController) GetGroupMembers(groupID string) ([]dto.GroupUserResponse, error) {
-	// Check if group exists
-	var group models.Group
-	if err := c.db.First(&group, "id = ?", groupID).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
-		}
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to check group existence")
-	}
-
 	var groupUsers []models.GroupUser
-
 	if err := c.db.Where("group_id = ?", groupID).Find(&groupUsers).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch group members")
 	}
@@ -178,45 +146,20 @@ func (c *GroupUsersController) GetGroupMembers(groupID string) ([]dto.GroupUserR
 	return response, nil
 }
 
-// GetGroupContainingMember returns all groups that contain the specified user as a member
+// GetGroupsContainingMember returns all groups that contain the specified user as a member
 func (c *GroupUsersController) GetGroupsContainingMember(userID uint) ([]dto.GroupResponse, error) {
-	// Check if user exists
-	var user models.User
-	if err := c.db.First(&user, userID).Error; err != nil {
-		return nil, fiber.NewError(fiber.StatusNotFound, "User not found")
-	}
-
-	// Get all groups where the user is a member
-	var groupUsers []models.GroupUser
-	if err := c.db.Where("user_id = ?", userID).Find(&groupUsers).Error; err != nil {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch user's groups")
-	}
-
-	// If user is not a member of any groups, return empty array
-	if len(groupUsers) == 0 {
-		return []dto.GroupResponse{}, nil
-	}
-
-	// Get all group IDs
-	groupIDs := make([]string, len(groupUsers))
-	for i, gu := range groupUsers {
-		groupIDs[i] = gu.GroupID
-	}
-
-	// Fetch all groups with their creators and members
 	var groups []models.Group
 	if err := c.db.Preload("Creator").
 		Preload("Members").
 		Preload("Members.User").
-		Where("id IN ?", groupIDs).
+		Joins("JOIN group_users ON group_users.group_id = groups.id").
+		Where("group_users.user_id = ?", userID).
 		Find(&groups).Error; err != nil {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch groups details")
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch groups containing member")
 	}
 
-	// Convert to response DTOs
 	response := make([]dto.GroupResponse, len(groups))
 	for i, group := range groups {
-		// Convert members to GroupUserResponse
 		members := lo.Map(group.Members, func(member models.GroupUser, _ int) dto.GroupUserResponse {
 			return dto.GroupUserResponse{
 				UserID:    member.UserID,
@@ -228,14 +171,11 @@ func (c *GroupUsersController) GetGroupsContainingMember(userID uint) ([]dto.Gro
 		})
 
 		response[i] = dto.GroupResponse{
-			ID:   group.ID,
-			Name: group.Name,
-			Type: group.Type,
-			Code: group.Code,
-			Creator: dto.GroupCreator{
-				ID:       group.Creator.ID,
-				Username: group.Creator.Username,
-			},
+			ID:                group.ID,
+			Name:              group.Name,
+			Type:              group.Type,
+			Code:              group.Code,
+			Creator:           dto.GroupCreator{ID: group.Creator.ID, Username: group.Creator.Username},
 			MidpointLatitude:  group.MidpointLatitude,
 			MidpointLongitude: group.MidpointLongitude,
 			Radius:            group.Radius,

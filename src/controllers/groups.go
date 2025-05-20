@@ -32,8 +32,9 @@ func CreateGroupsController() *GroupsController {
 func generateGroupCode() string {
 	// TODO: move this to consts
 	code := make([]byte, 10)
+	charsetLength := big.NewInt(int64(len(config.GROUP_CODE_CHARSET)))
 	for i := range code {
-		n := lo.Must(rand.Int(rand.Reader, big.NewInt(int64(len(config.GROUP_CODE_CHARSET)))))
+		n := lo.Must(rand.Int(rand.Reader, charsetLength))
 
 		code[i] = config.GROUP_CODE_CHARSET[n.Int64()]
 	}

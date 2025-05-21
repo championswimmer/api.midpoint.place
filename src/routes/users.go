@@ -64,6 +64,9 @@ func registerUser(ctx *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param user body dto.LoginUserRequest true "User"
+// @Success 200 {object} dto.UserResponse "User logged in successfully"
+// @Failure 400 {object} dto.ErrorResponse "Invalid request"
+// @Failure 401 {object} dto.ErrorResponse "Invalid credentials"
 // @Router /users/login [post]
 func loginUser(ctx *fiber.Ctx) error {
 	u, parseError := parsers.ParseBody[dto.LoginUserRequest](ctx)
@@ -92,6 +95,9 @@ func loginUser(ctx *fiber.Ctx) error {
 // @Produce json
 // @Param userid path string true "User ID"
 // @Param user body dto.UserUpdateRequest true "User"
+// @Success 200 {object} dto.UserResponse "User updated successfully"
+// @Failure 400 {object} dto.ErrorResponse "Invalid request"
+// @Failure 403 {object} dto.ErrorResponse "You are not allowed to update this user's data"
 // @Router /users/{userid} [post]
 // @Security BearerAuth
 func updateUserData(ctx *fiber.Ctx) error {

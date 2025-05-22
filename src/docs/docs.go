@@ -724,6 +724,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "member_count": {
+                    "type": "integer"
+                },
                 "members": {
                     "type": "array",
                     "items": {

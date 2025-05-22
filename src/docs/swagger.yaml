@@ -103,6 +103,8 @@ definitions:
         $ref: '#/definitions/dto.GroupCreator'
       id:
         type: string
+      member_count:
+        type: integer
       members:
         items:
           $ref: '#/definitions/dto.GroupUserResponse'

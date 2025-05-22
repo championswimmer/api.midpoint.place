@@ -262,10 +262,11 @@ func (c *GroupsController) GetGroupsByCreator(creatorID uint) ([]dto.GroupRespon
 	var groupsWithCount []GroupWithMemberCount
 
 	if err := c.db.Model(&models.Group{}).
+		Preload("Creator").
 		Select("groups.*, COUNT(group_users.group_id) as member_count").
 		Joins("LEFT JOIN group_users ON groups.id = group_users.group_id").
-		Preload("Creator").
 		Where("groups.creator_id = ?", creatorID).
+		Group("groups.id").
 		Order("groups.created_at desc").
 		Find(&groupsWithCount).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch groups by creator")

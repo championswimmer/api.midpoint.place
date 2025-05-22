@@ -254,59 +254,79 @@ func (c *GroupsController) UpdateGroupMidpoint(groupID string, req *dto.UpdateGr
 }
 
 func (c *GroupsController) GetGroupsByCreator(creatorID uint) ([]dto.GroupResponse, error) {
-	var groups []models.Group
-
-	// Fetch all groups created by the user, preload creator info
-	if err := c.db.Preload("Creator").Where("creator_id = ?", creatorID).Find(&groups).Error; err != nil {
-		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch groups")
+	type GroupWithMemberCount struct {
+		models.Group
+		MemberCount int `gorm:"column:member_count"`
 	}
 
-	// Convert to response DTOs
-	groupResponses := make([]dto.GroupResponse, len(groups))
-	for i, group := range groups {
-		groupResponses[i] = dto.GroupResponse{
-			ID:   group.ID,
-			Name: group.Name,
-			Type: group.Type,
-			Code: group.Code,
+	var groupsWithCount []GroupWithMemberCount
+
+	if err := c.db.Model(&models.Group{}).
+		Select("groups.*, COUNT(group_users.group_id) as member_count").
+		Joins("LEFT JOIN group_users ON groups.id = group_users.group_id").
+		Preload("Creator").
+		Where("groups.creator_id = ?", creatorID).
+		Order("groups.created_at desc").
+		Find(&groupsWithCount).Error; err != nil {
+		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch groups by creator")
+	}
+
+	groupResponses := lo.Map(groupsWithCount, func(gwc GroupWithMemberCount, _ int) dto.GroupResponse {
+		return dto.GroupResponse{
+			ID:   gwc.Group.ID,
+			Name: gwc.Group.Name,
+			Type: gwc.Group.Type,
+			Code: gwc.Group.Code,
 			Creator: dto.GroupCreator{
-				ID:       group.Creator.ID,
-				Username: group.Creator.Username,
+				ID:       gwc.Group.Creator.ID,
+				Username: gwc.Group.Creator.Username,
 			},
-			MidpointLatitude:  group.MidpointLatitude,
-			MidpointLongitude: group.MidpointLongitude,
-			Radius:            group.Radius,
+			MidpointLatitude:  gwc.Group.MidpointLatitude,
+			MidpointLongitude: gwc.Group.MidpointLongitude,
+			Radius:            gwc.Group.Radius,
+			MemberCount:       gwc.MemberCount,
 		}
-	}
+	})
 
 	return groupResponses, nil
 }
 
 func (c *GroupsController) GetPublicGroups(limit int) ([]dto.GroupResponse, error) {
-	var groups []models.Group
+	// Define a temporary struct to hold the query result including MemberCount
+	type GroupWithMemberCount struct {
+		models.Group
+		MemberCount int `gorm:"column:member_count"`
+	}
 
-	if err := c.db.Preload("Creator").
-		Where("type = ?", config.GroupTypePublic).
-		Order("created_at desc").
+	var groupsWithCount []GroupWithMemberCount
+
+	if err := c.db.Model(&models.Group{}).
+		Preload("Creator").
+		Select("groups.*, COUNT(group_users.group_id) as member_count").
+		Joins("LEFT JOIN group_users ON groups.id = group_users.group_id").
+		Where("groups.type = ?", config.GroupTypePublic).
+		Group("groups.id").
+		Order("groups.created_at desc").
 		Limit(limit).
-		Find(&groups).Error; err != nil {
+		Find(&groupsWithCount).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch public groups")
 	}
 
 	// Convert to response DTOs
-	groupResponses := lo.Map(groups, func(group models.Group, _ int) dto.GroupResponse {
+	groupResponses := lo.Map(groupsWithCount, func(gwc GroupWithMemberCount, _ int) dto.GroupResponse {
 		return dto.GroupResponse{
-			ID:   group.ID,
-			Name: group.Name,
-			Type: group.Type,
-			Code: group.Code,
+			ID:   gwc.Group.ID,
+			Name: gwc.Group.Name,
+			Type: gwc.Group.Type,
+			Code: gwc.Group.Code,
 			Creator: dto.GroupCreator{
-				ID:       group.Creator.ID,
-				Username: group.Creator.Username,
+				ID:       gwc.Group.Creator.ID,
+				Username: gwc.Group.Creator.Username,
 			},
-			MidpointLatitude:  group.MidpointLatitude,
-			MidpointLongitude: group.MidpointLongitude,
-			Radius:            group.Radius,
+			MidpointLatitude:  gwc.Group.MidpointLatitude,
+			MidpointLongitude: gwc.Group.MidpointLongitude,
+			Radius:            gwc.Group.Radius,
+			MemberCount:       gwc.MemberCount,
 		}
 	})
 

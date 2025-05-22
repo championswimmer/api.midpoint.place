@@ -34,6 +34,7 @@ type GroupResponse struct {
 	MidpointLatitude  float64              `json:"midpoint_latitude"`
 	MidpointLongitude float64              `json:"midpoint_longitude"`
 	Radius            int                  `json:"radius"`
+	MemberCount       int                  `json:"member_count,omitempty"`
 	Members           []GroupUserResponse  `json:"members,omitempty"`
 	Places            []GroupPlaceResponse `json:"places,omitempty"`
 }

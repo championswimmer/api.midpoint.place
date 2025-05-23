@@ -264,7 +264,7 @@ func (c *GroupsController) GetGroupsByCreator(creatorID uint) ([]dto.GroupRespon
 	if err := c.db.Model(&models.Group{}).
 		Preload("Creator").
 		Select("groups.*, COUNT(group_users.group_id) as member_count").
-		Joins("LEFT JOIN group_users ON groups.id = group_users.group_id").
+		Joins("LEFT JOIN group_users ON groups.id = group_users.group_id AND group_users.deleted_at IS NULL").
 		Where("groups.creator_id = ?", creatorID).
 		Group("groups.id").
 		Order("groups.created_at desc").
@@ -304,7 +304,7 @@ func (c *GroupsController) GetPublicGroups(limit int) ([]dto.GroupResponse, erro
 	if err := c.db.Model(&models.Group{}).
 		Preload("Creator").
 		Select("groups.*, COUNT(group_users.group_id) as member_count").
-		Joins("LEFT JOIN group_users ON groups.id = group_users.group_id").
+		Joins("LEFT JOIN group_users ON groups.id = group_users.group_id AND group_users.deleted_at IS NULL").
 		Where("groups.type = ?", config.GroupTypePublic).
 		Group("groups.id").
 		Order("groups.created_at desc").

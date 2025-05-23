@@ -162,7 +162,7 @@ func (c *GroupUsersController) GetGroupsContainingMember(userID uint) ([]dto.Gro
 	if err := c.db.Preload("Creator").
 		Preload("Members").
 		Preload("Members.User").
-		Joins("JOIN group_users ON group_users.group_id = groups.id").
+		Joins("JOIN group_users ON group_users.group_id = groups.id AND group_users.deleted_at IS NULL").
 		Where("group_users.user_id = ?", userID).
 		Find(&groups).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch groups containing member")

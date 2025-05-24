@@ -146,6 +146,8 @@ definitions:
         $ref: '#/definitions/config.GroupUserRole'
       user_id:
         type: integer
+      username:
+        type: string
     type: object
   dto.Location:
     properties:

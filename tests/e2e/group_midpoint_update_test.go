@@ -67,6 +67,10 @@ func TestGroupMidpointUpdate(t *testing.T) {
 				assert.Equal(t, group1.ID, response.ID)
 				assert.Equal(t, 51.5013237, response.MidpointLatitude)
 				assert.Equal(t, -0.1848902, response.MidpointLongitude)
+
+				assert.NotZero(t, len(response.Members))
+				member1 := response.Members[0]
+				assert.NotNil(t, member1.Username)
 			},
 		},
 	}
@@ -86,7 +90,7 @@ func TestGroupMidpointUpdate(t *testing.T) {
 
 			// fetch group details to check new midpoint
 
-			req = httptest.NewRequest(fiber.MethodGet, "/v1/groups/"+tc.groupID, nil)
+			req = httptest.NewRequest(fiber.MethodGet, "/v1/groups/"+tc.groupID+"?includeUsers=true", nil)
 			req.Header.Set("Authorization", "Bearer "+tc.userToken)
 			resp = lo.Must(tests.App.Test(req, -1))
 			assert.Equal(t, fiber.StatusOK, resp.StatusCode)

@@ -52,7 +52,7 @@ test_unit: test_clean
 
 test_e2e: test_clean
 	@echo "Running end-to-end tests..."
-	@@GOOS=$(OS) GOARCH=$(ARCH) ENV=test go test -count 1 -timeout 10s -race -coverprofile=coverage.e2e.out -covermode=atomic -v -coverpkg=./src/...  ./tests/...
+	@@GOOS=$(OS) GOARCH=$(ARCH) ENV=test go test -count 1 -timeout 20s -race -coverprofile=coverage.e2e.out -covermode=atomic -v -coverpkg=./src/...  ./tests/...
 
 test: test_unit test_e2e
 

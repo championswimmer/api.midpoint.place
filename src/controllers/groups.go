@@ -11,6 +11,7 @@ import (
 	"github.com/championswimmer/api.midpoint.place/src/db/models"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
 	"github.com/championswimmer/api.midpoint.place/src/server/validators"
+	"github.com/championswimmer/api.midpoint.place/src/utils/applogger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
@@ -56,8 +57,8 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 	// Check if input is valid UUID or 10-char alphanumeric code
 	isValidUUID := uuid.Validate(groupIDorCode) == nil
 	isValidCode := len(groupIDorCode) == 10 && func() bool {
-		for _, c := range groupIDorCode {
-			if !strings.ContainsRune(config.GROUP_CODE_CHARSET, c) {
+		for _, r := range groupIDorCode {
+			if !strings.ContainsRune(config.GROUP_CODE_CHARSET, r) {
 				return false
 			}
 		}
@@ -72,7 +73,10 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 	query := c.db.Preload("Creator").Joins("LEFT JOIN users ON groups.creator_id = users.id")
 
 	if includeUsers {
-		query = query.Preload("Members").Joins("LEFT JOIN group_users ON groups.id = group_users.group_id")
+		query = query.Preload("Members", "group_users.deleted_at IS NULL").
+			Preload("Members.User").
+			Joins("LEFT JOIN group_users ON groups.id = group_users.group_id")
+		applogger.Info("query", query.Statement.SQL.String())
 	}
 	if includePlaces {
 		query = query.Preload("Places").Joins("LEFT JOIN group_places ON groups.id = group_places.group_id")
@@ -107,6 +111,7 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 			return dto.GroupUserResponse{
 				UserID:    member.UserID,
 				GroupID:   member.GroupID,
+				Username:  member.User.Username,
 				Latitude:  member.Latitude,
 				Longitude: member.Longitude,
 				Role:      member.Role,

@@ -11,6 +11,7 @@ type GroupUserJoinRequest struct {
 type GroupUserResponse struct {
 	UserID    uint                 `json:"user_id"`
 	GroupID   string               `json:"group_id"`
+	Username  string               `json:"username,omitempty"`
 	Latitude  float64              `json:"latitude"`
 	Longitude float64              `json:"longitude"`
 	Role      config.GroupUserRole `json:"role"`

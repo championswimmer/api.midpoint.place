@@ -69,12 +69,13 @@ func (c *GroupPlacesController) AddPlacesToGroup(groupID string, req *dto.GroupP
 				Latitude:  place.Latitude,
 				Longitude: place.Longitude,
 			}
+			groupPlace.DeletedAt = gorm.DeletedAt{}
 			newPlaces = append(newPlaces, groupPlace)
 		}
 
 		// Bulk insert if there are any new places
 		if len(newPlaces) > 0 {
-			if err := tx.Create(&newPlaces).Error; err != nil {
+			if err := tx.Save(&newPlaces).Error; err != nil {
 				return fiber.NewError(fiber.StatusInternalServerError, "Failed to add places to group")
 			}
 

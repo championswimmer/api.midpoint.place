@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"strconv"
+
 	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/controllers"
 	"github.com/championswimmer/api.midpoint.place/src/db/models"
@@ -31,6 +33,7 @@ func GroupsRoute() func(router fiber.Router) {
 		router.Patch("/:groupIdOrCode", security.MandatoryJwtAuthMiddleware, updateGroup)
 		router.Put("/:groupIdOrCode/join", security.MandatoryJwtAuthMiddleware, joinGroup)
 		router.Delete("/:groupIdOrCode/join", security.MandatoryJwtAuthMiddleware, leaveGroup)
+		router.Get("/users/:userid/groups", security.MandatoryJwtAuthMiddleware, getPublicGroupsByUser)
 	}
 }
 
@@ -234,6 +237,31 @@ func getGroup(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(group)
+}
+
+// @Summary Get public groups created by a user
+// @Description Get a list of all public groups created by a specific user
+// @Tags groups
+// @ID get-public-groups-by-user
+// @Produce json
+// @Param userid path string true "User ID"
+// @Success 200 {array} dto.GroupResponse "List of public groups created by the user"
+// @Failure 500 {object} dto.ErrorResponse "Failed to fetch groups"
+// @Router /users/{userid}/groups [get]
+// @Security BearerAuth
+func getPublicGroupsByUser(ctx *fiber.Ctx) error {
+	userIDStr := ctx.Params("userid")
+	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.CreateErrorResponse(fiber.StatusBadRequest, "Invalid user ID"))
+	}
+
+	groups, err := groupsController.GetPublicGroupsByCreator(uint(userID))
+	if err != nil {
+		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(groups)
 }
 
 // side effects:

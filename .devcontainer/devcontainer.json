@@ -1,7 +1,7 @@
 {
   "tasks": {
     "build": "DOCS=false make build",
-    "test": "make test",
+    "test": "make test_e2e",
     "launch": "make run"
   }
 }

@@ -1,6 +1,7 @@
 package applogger
 
 import (
+	"fmt"
 	"log"
 	"os"
 )
@@ -34,34 +35,34 @@ var (
 )
 
 func Trace(v ...interface{}) {
-	traceLogger.Println(v...)
+	traceLogger.Output(2, fmt.Sprintln(v...))
 }
 
 func Debug(v ...interface{}) {
-	debugLogger.Println(v...)
+	debugLogger.Output(2, fmt.Sprintln(v...))
 }
 
 func Info(v ...interface{}) {
-	infoLogger.Println(v...)
+	infoLogger.Output(2, fmt.Sprintln(v...))
 
 }
 
 func Warn(v ...interface{}) {
-	warnLogger.Println(v...)
+	warnLogger.Output(2, fmt.Sprintln(v...))
 
 }
 
 func Error(v ...interface{}) {
-	errorLogger.Println(v...)
+	errorLogger.Output(2, fmt.Sprintln(v...))
 
 }
 
 func Fatal(v ...interface{}) {
-	fatalLogger.Println(v...)
+	fatalLogger.Output(2, fmt.Sprintln(v...))
 	os.Exit(1)
 }
 
 func Panic(v ...interface{}) {
-	panicLogger.Println(v...)
+	panicLogger.Output(2, fmt.Sprintln(v...))
 	panic(v)
 }

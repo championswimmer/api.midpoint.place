@@ -404,7 +404,7 @@ const docTemplate = `{
                         }
                     },
                     "409": {
-                        "description": "Username already exists",
+                        "description": "Email already exists",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -645,10 +645,13 @@ const docTemplate = `{
         "dto.CreateUserRequest": {
             "type": "object",
             "properties": {
-                "password": {
+                "display_name": {
                     "type": "string"
                 },
-                "username": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 }
             }
@@ -669,11 +672,11 @@ const docTemplate = `{
         "dto.GroupCreator": {
             "type": "object",
             "properties": {
+                "display_name": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         },
@@ -774,6 +777,9 @@ const docTemplate = `{
         "dto.GroupUserResponse": {
             "type": "object",
             "properties": {
+                "display_name": {
+                    "type": "string"
+                },
                 "group_id": {
                     "type": "string"
                 },
@@ -788,9 +794,6 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         },
@@ -812,10 +815,10 @@ const docTemplate = `{
         "dto.LoginUserRequest": {
             "type": "object",
             "properties": {
-                "password": {
+                "email": {
                     "type": "string"
                 },
-                "username": {
+                "password": {
                     "type": "string"
                 }
             }
@@ -850,6 +853,12 @@ const docTemplate = `{
         "dto.UserResponse": {
             "type": "object",
             "properties": {
+                "display_name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -857,9 +866,6 @@ const docTemplate = `{
                     "$ref": "#/definitions/dto.Location"
                 },
                 "token": {
-                    "type": "string"
-                },
-                "username": {
                     "type": "string"
                 }
             }

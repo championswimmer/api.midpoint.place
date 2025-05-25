@@ -16,7 +16,7 @@ import (
 
 func TestUsersRoute_LoginUser(t *testing.T) {
 	// First register a user
-	tests.TestUtil_CreateUser(t, "testuser111", "testpassword111")
+	tests.TestUtil_CreateUser(t, "testuser111@test.com", "testpassword111")
 
 	// Test cases
 	testCases := []struct {
@@ -27,20 +27,20 @@ func TestUsersRoute_LoginUser(t *testing.T) {
 	}{
 		{
 			name:           "successful login",
-			requestBody:    []byte(`{"username": "testuser111", "password": "testpassword111"}`),
+			requestBody:    []byte(`{"email": "testuser111@test.com", "password": "testpassword111"}`),
 			expectedStatus: fiber.StatusOK,
 			checkResponse: func(t *testing.T, body []byte) {
 				var userResp dto.UserResponse
 				err := json.Unmarshal(body, &userResp)
 				assert.NoError(t, err)
-				assert.Equal(t, "testuser111", userResp.Username)
+				assert.Equal(t, "testuser111@test.com", userResp.Email)
 				assert.NotEmpty(t, userResp.Token)
 				assert.NotEmpty(t, userResp.ID)
 			},
 		},
 		{
 			name:           "wrong password",
-			requestBody:    []byte(`{"username": "testuser111", "password": "wrongpassword222"}`),
+			requestBody:    []byte(`{"email": "testuser111@test.com", "password": "wrongpassword222"}`),
 			expectedStatus: fiber.StatusUnauthorized,
 			checkResponse: func(t *testing.T, body []byte) {
 				var errResp dto.ErrorResponse
@@ -51,7 +51,7 @@ func TestUsersRoute_LoginUser(t *testing.T) {
 		},
 		{
 			name:           "user not found",
-			requestBody:    []byte(`{"username": "nonexistentuser", "password": "testpassword"}`),
+			requestBody:    []byte(`{"email": "nonexistentuser@test.com", "password": "testpassword"}`),
 			expectedStatus: fiber.StatusNotFound,
 			checkResponse: func(t *testing.T, body []byte) {
 				var errResp dto.ErrorResponse

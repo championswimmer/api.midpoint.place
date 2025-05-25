@@ -16,7 +16,7 @@ import (
 
 func TestUsersRoute_RegisterUser(t *testing.T) {
 
-	reqBody := []byte(`{"username": "testuser125", "password": "testpassword125"}`)
+	reqBody := []byte(`{"email": "testuser125@test.com", "password": "testpassword125", "display_name": "testuser125"}`)
 
 	req := httptest.NewRequest("POST", "/v1/users", bytes.NewBuffer(reqBody))
 	req.Header.Set("Content-Type", "application/json")
@@ -36,7 +36,7 @@ func TestUsersRoute_RegisterUser(t *testing.T) {
 		t.Fatalf("Failed to unmarshal response body: %v", err)
 	}
 
-	assert.Equal(t, "testuser125", response.Username)
+	assert.Equal(t, "testuser125@test.com", response.Email)
 	assert.NotEmpty(t, response.Token)
 	assert.NotEmpty(t, response.ID)
 }

@@ -9,10 +9,10 @@ type GroupUserJoinRequest struct {
 
 // GroupUserResponse represents the response for group user operations
 type GroupUserResponse struct {
-	UserID    uint                 `json:"user_id"`
-	GroupID   string               `json:"group_id"`
-	Username  string               `json:"username,omitempty"`
-	Latitude  float64              `json:"latitude"`
-	Longitude float64              `json:"longitude"`
-	Role      config.GroupUserRole `json:"role"`
+	UserID      uint                 `json:"user_id"`
+	GroupID     string               `json:"group_id"`
+	DisplayName string               `json:"display_name,omitempty"`
+	Latitude    float64              `json:"latitude"`
+	Longitude   float64              `json:"longitude"`
+	Role        config.GroupUserRole `json:"role"`
 }

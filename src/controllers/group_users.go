@@ -185,7 +185,7 @@ func (c *GroupUsersController) GetGroupsContainingMember(userID uint) ([]dto.Gro
 			Name:              group.Name,
 			Type:              group.Type,
 			Code:              group.Code,
-			Creator:           dto.GroupCreator{ID: group.Creator.ID, Username: group.Creator.Username},
+			Creator:           dto.GroupCreator{ID: group.Creator.ID, DisplayName: group.Creator.DisplayName},
 			MidpointLatitude:  group.MidpointLatitude,
 			MidpointLongitude: group.MidpointLongitude,
 			Radius:            group.Radius,

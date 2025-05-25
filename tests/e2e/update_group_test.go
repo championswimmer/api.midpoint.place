@@ -16,7 +16,7 @@ import (
 
 func TestGroupsRoute_UpdateGroup(t *testing.T) {
 	// First create a new user
-	createdUser := tests.TestUtil_CreateUser(t, "testuser145", "testpassword145")
+	createdUser := tests.TestUtil_CreateUser(t, "testuser145@test.com", "testpassword145")
 
 	// Create a new group
 	createdGroup := tests.TestUtil_CreateGroup(t, createdUser.Token, "Test Group 03")

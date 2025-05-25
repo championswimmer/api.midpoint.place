@@ -98,8 +98,8 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 		Type: group.Type,
 		Code: group.Code,
 		Creator: dto.GroupCreator{
-			ID:       group.Creator.ID,
-			Username: group.Creator.Username,
+			ID:          group.Creator.ID,
+			DisplayName: group.Creator.DisplayName,
 		},
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
@@ -109,12 +109,12 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 	if includeUsers {
 		groupResponse.Members = lo.Map(group.Members, func(member models.GroupUser, _ int) dto.GroupUserResponse {
 			return dto.GroupUserResponse{
-				UserID:    member.UserID,
-				GroupID:   member.GroupID,
-				Username:  member.User.Username,
-				Latitude:  member.Latitude,
-				Longitude: member.Longitude,
-				Role:      member.Role,
+				UserID:      member.UserID,
+				GroupID:     member.GroupID,
+				DisplayName: member.User.DisplayName,
+				Latitude:    member.Latitude,
+				Longitude:   member.Longitude,
+				Role:        member.Role,
 			}
 		})
 	}
@@ -183,8 +183,8 @@ func (c *GroupsController) CreateGroup(creatorID uint, req *dto.CreateGroupReque
 		Type: group.Type,
 		Code: group.Code,
 		Creator: dto.GroupCreator{
-			ID:       creator.ID,
-			Username: creator.Username,
+			ID:          creator.ID,
+			DisplayName: creator.DisplayName,
 		},
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
@@ -222,8 +222,8 @@ func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupReque
 		Type: group.Type,
 		Code: group.Code,
 		Creator: dto.GroupCreator{
-			ID:       group.Creator.ID,
-			Username: group.Creator.Username,
+			ID:          group.Creator.ID,
+			DisplayName: group.Creator.DisplayName,
 		},
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
@@ -249,8 +249,8 @@ func (c *GroupsController) UpdateGroupMidpoint(groupID string, req *dto.UpdateGr
 		Type: group.Type,
 		Code: group.Code,
 		Creator: dto.GroupCreator{
-			ID:       group.Creator.ID,
-			Username: group.Creator.Username,
+			ID:          group.Creator.ID,
+			DisplayName: group.Creator.DisplayName,
 		},
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
@@ -284,8 +284,8 @@ func (c *GroupsController) GetGroupsByCreator(creatorID uint) ([]dto.GroupRespon
 			Type: gwc.Group.Type,
 			Code: gwc.Group.Code,
 			Creator: dto.GroupCreator{
-				ID:       gwc.Group.Creator.ID,
-				Username: gwc.Group.Creator.Username,
+				ID:          gwc.Group.Creator.ID,
+				DisplayName: gwc.Group.Creator.DisplayName,
 			},
 			MidpointLatitude:  gwc.Group.MidpointLatitude,
 			MidpointLongitude: gwc.Group.MidpointLongitude,
@@ -326,8 +326,8 @@ func (c *GroupsController) GetPublicGroups(limit int) ([]dto.GroupResponse, erro
 			Type: gwc.Group.Type,
 			Code: gwc.Group.Code,
 			Creator: dto.GroupCreator{
-				ID:       gwc.Group.Creator.ID,
-				Username: gwc.Group.Creator.Username,
+				ID:          gwc.Group.Creator.ID,
+				DisplayName: gwc.Group.Creator.DisplayName,
 			},
 			MidpointLatitude:  gwc.Group.MidpointLatitude,
 			MidpointLongitude: gwc.Group.MidpointLongitude,

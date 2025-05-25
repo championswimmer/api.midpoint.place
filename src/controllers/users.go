@@ -21,16 +21,17 @@ func CreateUsersController() *UsersController {
 }
 
 func (c *UsersController) CreateUser(req *dto.CreateUserRequest) (*dto.UserResponse, error) {
-	// Check if username already exists
+	// Check if email already exists
 	var existingUser models.User
-	if err := c.db.Where("username = ?", req.Username).First(&existingUser).Error; err == nil {
-		return nil, fiber.NewError(fiber.StatusConflict, "Username already exists")
+	if err := c.db.Where("email = ?", req.Email).First(&existingUser).Error; err == nil {
+		return nil, fiber.NewError(fiber.StatusConflict, "Email already exists")
 	}
 
 	// Create new user
 	user := models.User{
-		Username: req.Username,
-		Password: security.HashPassword(req.Password),
+		Email:       req.Email,
+		DisplayName: req.DisplayName,
+		Password:    security.HashPassword(req.Password),
 	}
 
 	if err := c.db.Create(&user).Error; err != nil {
@@ -40,9 +41,10 @@ func (c *UsersController) CreateUser(req *dto.CreateUserRequest) (*dto.UserRespo
 	token := security.CreateJWTFromUser(&user)
 
 	return &dto.UserResponse{
-		ID:       user.ID,
-		Username: user.Username,
-		Token:    token,
+		ID:          user.ID,
+		Email:       user.Email,
+		DisplayName: user.DisplayName,
+		Token:       token,
 		Location: dto.Location{
 			Latitude:  user.Latitude,
 			Longitude: user.Longitude,
@@ -61,7 +63,7 @@ func (c *UsersController) GetUserByID(id uint) (*models.User, error) {
 
 func (c *UsersController) LoginUser(req *dto.LoginUserRequest) (*dto.UserResponse, error) {
 	var user models.User
-	if err := c.db.Where("username = ?", req.Username).First(&user).Error; err != nil {
+	if err := c.db.Where("email = ?", req.Email).First(&user).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusNotFound, "User not found")
 	}
 
@@ -72,9 +74,10 @@ func (c *UsersController) LoginUser(req *dto.LoginUserRequest) (*dto.UserRespons
 	token := security.CreateJWTFromUser(&user)
 
 	return &dto.UserResponse{
-		ID:       user.ID,
-		Username: user.Username,
-		Token:    token,
+		ID:          user.ID,
+		Email:       user.Email,
+		DisplayName: user.DisplayName,
+		Token:       token,
 		Location: dto.Location{
 			Latitude:  user.Latitude,
 			Longitude: user.Longitude,
@@ -99,9 +102,10 @@ func (c *UsersController) UpdateUserLocation(userID uint, req *dto.UserUpdateReq
 	token := security.CreateJWTFromUser(&user)
 
 	return &dto.UserResponse{
-		ID:       user.ID,
-		Username: user.Username,
-		Token:    token,
+		ID:          user.ID,
+		Email:       user.Email,
+		DisplayName: user.DisplayName,
+		Token:       token,
 		Location: dto.Location{
 			Latitude:  user.Latitude,
 			Longitude: user.Longitude,

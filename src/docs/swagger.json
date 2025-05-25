@@ -402,7 +402,7 @@
                         }
                     },
                     "409": {
-                        "description": "Username already exists",
+                        "description": "Email already exists",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorResponse"
                         }
@@ -643,10 +643,13 @@
         "dto.CreateUserRequest": {
             "type": "object",
             "properties": {
-                "password": {
+                "display_name": {
                     "type": "string"
                 },
-                "username": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 }
             }
@@ -667,11 +670,11 @@
         "dto.GroupCreator": {
             "type": "object",
             "properties": {
+                "display_name": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         },
@@ -772,6 +775,9 @@
         "dto.GroupUserResponse": {
             "type": "object",
             "properties": {
+                "display_name": {
+                    "type": "string"
+                },
                 "group_id": {
                     "type": "string"
                 },
@@ -786,9 +792,6 @@
                 },
                 "user_id": {
                     "type": "integer"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         },
@@ -810,10 +813,10 @@
         "dto.LoginUserRequest": {
             "type": "object",
             "properties": {
-                "password": {
+                "email": {
                     "type": "string"
                 },
-                "username": {
+                "password": {
                     "type": "string"
                 }
             }
@@ -848,6 +851,12 @@
         "dto.UserResponse": {
             "type": "object",
             "properties": {
+                "display_name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -855,9 +864,6 @@
                     "$ref": "#/definitions/dto.Location"
                 },
                 "token": {
-                    "type": "string"
-                },
-                "username": {
                     "type": "string"
                 }
             }

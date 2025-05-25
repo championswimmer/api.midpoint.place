@@ -17,7 +17,7 @@ import (
 
 func TestGroupsRoute_CreateGroup(t *testing.T) {
 	// First register a user
-	createdUser := tests.TestUtil_CreateUser(t, "testuser222", "testpassword222")
+	createdUser := tests.TestUtil_CreateUser(t, "testuser222@test.com", "testpassword222")
 	var createdGroup dto.GroupResponse
 
 	testcases := []struct {
@@ -42,7 +42,7 @@ func TestGroupsRoute_CreateGroup(t *testing.T) {
 				assert.Equal(t, config.GroupTypePublic, groupResp.Type)
 				assert.Equal(t, 1200, groupResp.Radius)
 				assert.Equal(t, createdUser.ID, groupResp.Creator.ID)
-				assert.Equal(t, createdUser.Username, groupResp.Creator.Username)
+				assert.Equal(t, createdUser.DisplayName, groupResp.Creator.DisplayName)
 				createdGroup = groupResp
 			},
 		},

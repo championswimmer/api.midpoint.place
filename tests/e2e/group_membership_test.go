@@ -17,8 +17,8 @@ import (
 
 func TestGroupsRoute_MembershipOperations(t *testing.T) {
 	// Create two users
-	user1 := tests.TestUtil_CreateUser(t, "testuser101", "testpassword101")
-	user2 := tests.TestUtil_CreateUser(t, "testuser201", "testpassword201")
+	user1 := tests.TestUtil_CreateUser(t, "testuser101@test.com", "testpassword101")
+	user2 := tests.TestUtil_CreateUser(t, "testuser201@test.com", "testpassword201")
 
 	group1 := tests.TestUtil_CreateGroup(t, user1.Token, "Test Group 1")
 	group2 := tests.TestUtil_CreateGroup(t, user1.Token, "Test Group 2")
@@ -97,8 +97,8 @@ func TestGroupsRoute_MembershipOperations(t *testing.T) {
 
 func TestGroupsRoute_AddUsersToGroupAndVerify(t *testing.T) {
 	// Create two users
-	user1 := tests.TestUtil_CreateUser(t, "testuser3301", "testpassword3301")
-	user2 := tests.TestUtil_CreateUser(t, "testuser4401", "testpassword4401")
+	user1 := tests.TestUtil_CreateUser(t, "testuser3301@test.com", "testpassword3301")
+	user2 := tests.TestUtil_CreateUser(t, "testuser4401@test.com", "testpassword4401")
 
 	// Create a group
 	group := tests.TestUtil_CreateGroup(t, user1.Token, "Test Group 3")

@@ -51,9 +51,11 @@ definitions:
     type: object
   dto.CreateUserRequest:
     properties:
-      password:
+      display_name:
         type: string
-      username:
+      email:
+        type: string
+      password:
         type: string
     type: object
   dto.ErrorResponse:
@@ -67,10 +69,10 @@ definitions:
     type: object
   dto.GroupCreator:
     properties:
+      display_name:
+        type: string
       id:
         type: integer
-      username:
-        type: string
     type: object
   dto.GroupPlaceResponse:
     properties:
@@ -136,6 +138,8 @@ definitions:
     type: object
   dto.GroupUserResponse:
     properties:
+      display_name:
+        type: string
       group_id:
         type: string
       latitude:
@@ -146,8 +150,6 @@ definitions:
         $ref: '#/definitions/config.GroupUserRole'
       user_id:
         type: integer
-      username:
-        type: string
     type: object
   dto.Location:
     properties:
@@ -161,9 +163,9 @@ definitions:
     type: object
   dto.LoginUserRequest:
     properties:
-      password:
+      email:
         type: string
-      username:
+      password:
         type: string
     type: object
   dto.UpdateGroupRequest:
@@ -185,13 +187,15 @@ definitions:
     type: object
   dto.UserResponse:
     properties:
+      display_name:
+        type: string
+      email:
+        type: string
       id:
         type: integer
       location:
         $ref: '#/definitions/dto.Location'
       token:
-        type: string
-      username:
         type: string
     type: object
   dto.UserUpdateRequest:
@@ -471,7 +475,7 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "409":
-          description: Username already exists
+          description: Email already exists
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Register a new user

@@ -18,7 +18,7 @@ import (
 
 func TestGroupsRoute_ListGroups(t *testing.T) {
 	// 1. Create user testuser501
-	createdUser := tests.TestUtil_CreateUser(t, "testuser5501", "testpassword5501")
+	createdUser := tests.TestUtil_CreateUser(t, "testuser5501@test.com", "testpassword5501")
 
 	// 2. Make a new public group with that user's token
 	groupName := "Test Public Group for Listing"

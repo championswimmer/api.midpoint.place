@@ -21,10 +21,11 @@ func init() {
 	App = server.CreateServer()
 }
 
-func TestUtil_CreateUser(t *testing.T, username string, password string) (userResponse *dto.UserResponse) {
+func TestUtil_CreateUser(t *testing.T, email string, password string) (userResponse *dto.UserResponse) {
 	user := dto.CreateUserRequest{
-		Username: username,
-		Password: password,
+		Email:       email,
+		DisplayName: email, // just a testing hack - we reuse the email as the display name
+		Password:    password,
 	}
 
 	body := lo.Must(json.Marshal(user))

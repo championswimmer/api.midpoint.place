@@ -36,7 +36,7 @@ func UsersRoute() func(router fiber.Router) {
 // @Param user body dto.CreateUserRequest true "User"
 // @Success 201 {object} dto.UserResponse "User created successfully"
 // @Failure 400 {object} dto.ErrorResponse "Invalid request"
-// @Failure 409 {object} dto.ErrorResponse "Username already exists"
+// @Failure 409 {object} dto.ErrorResponse "Email already exists"
 // @Router /users [post]
 func registerUser(ctx *fiber.Ctx) error {
 	u, parseError := parsers.ParseBody[dto.CreateUserRequest](ctx)

@@ -16,8 +16,8 @@ import (
 )
 
 func TestGroupMidpointUpdate(t *testing.T) {
-	user1 := tests.TestUtil_CreateUser(t, "testuser1101", "testpassword1101")
-	user2 := tests.TestUtil_CreateUser(t, "testuser2101", "testpassword2101")
+	user1 := tests.TestUtil_CreateUser(t, "testuser1101@test.com", "testpassword1101")
+	user2 := tests.TestUtil_CreateUser(t, "testuser2101@test.com", "testpassword2101")
 
 	group1 := tests.TestUtil_CreateGroup(t, user1.Token, "Test Group 1101")
 
@@ -70,7 +70,7 @@ func TestGroupMidpointUpdate(t *testing.T) {
 
 				assert.NotZero(t, len(response.Members))
 				member1 := response.Members[0]
-				assert.NotNil(t, member1.Username)
+				assert.NotNil(t, member1.DisplayName)
 			},
 		},
 	}

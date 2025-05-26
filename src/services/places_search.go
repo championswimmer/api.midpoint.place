@@ -7,6 +7,7 @@ import (
 	placespb "cloud.google.com/go/maps/places/apiv1/placespb"
 	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
+	"github.com/championswimmer/api.midpoint.place/src/utils/applogger"
 	"github.com/samber/lo"
 	"google.golang.org/genproto/googleapis/type/latlng"
 	"google.golang.org/grpc/metadata"
@@ -48,6 +49,7 @@ func (s *PlaceSearchService) NearbyPlaces(location dto.Location, radius int, pla
 		},
 	)
 	if err != nil {
+		applogger.Error("Error searching for nearby places", location, "with radius", radius, "and place type", placeType, err)
 		return nil, err
 	}
 

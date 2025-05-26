@@ -243,7 +243,7 @@ func getGroup(ctx *fiber.Ctx) error {
 // 2. delete existing group places
 // 3. populate group places (parallelly) for all place types
 func _triggerGroupMidpointUpdate(group *dto.GroupResponse) {
-	err := _recalculateGroupMidpoint(group.ID)
+	groupResp, err := _recalculateGroupMidpoint(group.ID)
 	if err != nil {
 		applogger.Error("Error recalculating group location", err)
 	}
@@ -260,7 +260,7 @@ func _triggerGroupMidpointUpdate(group *dto.GroupResponse) {
 	for _, placeType := range placeTypes {
 		// TODO: can be parallelized?
 		func(placeType config.PlaceType) {
-			err := _populateGroupPlaces(group, placeType)
+			err := _populateGroupPlaces(groupResp, placeType)
 			if err != nil {
 				applogger.Error("Error populating group places", group.ID, "with type", placeType, err)
 			}
@@ -268,11 +268,11 @@ func _triggerGroupMidpointUpdate(group *dto.GroupResponse) {
 	}
 }
 
-func _recalculateGroupMidpoint(groupID string) error {
+func _recalculateGroupMidpoint(groupID string) (*dto.GroupResponse, error) {
 	applogger.Info("Recalculating group midpoint for group", groupID)
 	centroidLatitude, centroidLongitude, err := groupUsersController.CalculateGroupCentroid(groupID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	applogger.Info("Recalculated group midpoint for group", groupID, "to", centroidLatitude, centroidLongitude)
 
@@ -280,12 +280,12 @@ func _recalculateGroupMidpoint(groupID string) error {
 	groupMidpointUpdateRequest.Latitude = centroidLatitude
 	groupMidpointUpdateRequest.Longitude = centroidLongitude
 
-	_, err = groupsController.UpdateGroupMidpoint(groupID, groupMidpointUpdateRequest)
+	groupResp, err := groupsController.UpdateGroupMidpoint(groupID, groupMidpointUpdateRequest)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return groupResp, nil
 }
 
 func _deleteExistingGroupPlaces(groupID string) error {

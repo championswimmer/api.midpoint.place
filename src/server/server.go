@@ -5,6 +5,7 @@ import (
 	"github.com/championswimmer/api.midpoint.place/src/routes"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
 )
 
@@ -21,6 +22,10 @@ func CreateServer() *fiber.App {
 	app := fiber.New(fiber.Config{
 		// Prefork: true,
 	})
+
+	app.Use(logger.New(logger.Config{
+		Format: "🌐 REQUEST ▶️ -------- [${ip}]:${port} ${status} - ${method} ${path}\n",
+	}))
 
 	// enable cors
 	app.Use(cors.New(cors.Config{

@@ -76,7 +76,6 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 		query = query.Preload("Members", "group_users.deleted_at IS NULL").
 			Preload("Members.User").
 			Joins("LEFT JOIN group_users ON groups.id = group_users.group_id")
-		applogger.Info("query", query.Statement.SQL.String())
 	}
 	if includePlaces {
 		query = query.Preload("Places").Joins("LEFT JOIN group_places ON groups.id = group_places.group_id")
@@ -236,6 +235,8 @@ func (c *GroupsController) UpdateGroupMidpoint(groupID string, req *dto.UpdateGr
 	if err := c.db.Preload("Creator").Where("id = ?", groupID).First(&group).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
 	}
+
+	applogger.Info("Updating group midpoint for group", groupID, "to", req.Latitude, req.Longitude)
 
 	group.MidpointLatitude = req.Latitude
 	group.MidpointLongitude = req.Longitude

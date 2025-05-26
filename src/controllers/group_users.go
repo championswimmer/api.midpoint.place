@@ -94,6 +94,8 @@ func (c *GroupUsersController) LeaveGroup(groupID string, userID uint) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to query user in group")
 	}
 
+	applogger.Info("Leaving group", groupID, "for user", userID)
+
 	// Remove the user from the group
 	if err := c.db.Delete(&groupUser).Error; err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to remove user from group")

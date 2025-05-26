@@ -174,6 +174,7 @@ func joinGroup(ctx *fiber.Ctx) error {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
 
+	// TODO: can be done in side effect (goroutine)
 	_triggerGroupMidpointUpdate(group)
 
 	return ctx.Status(fiber.StatusAccepted).JSON(groupUserResp)
@@ -205,6 +206,7 @@ func leaveGroup(ctx *fiber.Ctx) error {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
 
+	// TODO: can be done in side effect (goroutine)
 	_triggerGroupMidpointUpdate(group)
 	return ctx.Status(fiber.StatusAccepted).JSON([]byte("{}"))
 }
@@ -256,10 +258,11 @@ func _triggerGroupMidpointUpdate(group *dto.GroupResponse) {
 		config.PlaceTypePark,
 	}
 	for _, placeType := range placeTypes {
-		go func(placeType config.PlaceType) {
+		// TODO: can be parallelized?
+		func(placeType config.PlaceType) {
 			err := _populateGroupPlaces(group, placeType)
 			if err != nil {
-				applogger.Error("Error populating group places", err)
+				applogger.Error("Error populating group places", group.ID, "with type", placeType, err)
 			}
 		}(placeType)
 	}

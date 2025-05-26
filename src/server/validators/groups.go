@@ -2,10 +2,14 @@ package validators
 
 import (
 	"regexp"
+	"strconv"
 
 	"github.com/championswimmer/api.midpoint.place/src/dto"
 	"github.com/gofiber/fiber/v2"
+	"github.com/umahmood/haversine"
 )
+
+const MAX_DISTANCE_KM = 100
 
 func validateName(name string) *ValidationError {
 	if len(name) > 100 || len(name) < 1 {
@@ -71,5 +75,26 @@ func ValidateUpdateGroupRequest(req *dto.UpdateGroupRequest) *ValidationError {
 		}
 	}
 	// Add any other specific validations for UpdateGroupRequest
+	return nil
+}
+
+// TODO: there are no e2e tests for this yet.
+func ValidateLocationProximity(loc1 dto.Location, loc2 dto.Location) *ValidationError {
+	coord1 := haversine.Coord{
+		Lat: loc1.Latitude,
+		Lon: loc1.Longitude,
+	}
+	coord2 := haversine.Coord{
+		Lat: loc2.Latitude,
+		Lon: loc2.Longitude,
+	}
+	_, kmDistance := haversine.Distance(coord1, coord2)
+
+	if kmDistance > float64(MAX_DISTANCE_KM) {
+		return &ValidationError{
+			status:  fiber.StatusUnprocessableEntity,
+			message: "Cannot join group from too far away. Limit is " + strconv.Itoa(MAX_DISTANCE_KM) + "km",
+		}
+	}
 	return nil
 }

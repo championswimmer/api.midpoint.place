@@ -169,6 +169,20 @@ func joinGroup(ctx *fiber.Ctx) error {
 		return parsers.SendParsingError(ctx, parseError)
 	}
 
+	if group.MemberCount > 0 {
+		// Validate if user is within max group join bounds
+		validateErr := validators.ValidateLocationProximity(dto.Location{
+			Latitude:  group.MidpointLatitude,
+			Longitude: group.MidpointLongitude,
+		}, dto.Location{
+			Latitude:  groupUserReq.Latitude,
+			Longitude: groupUserReq.Longitude,
+		})
+		if validateErr != nil {
+			return validators.SendValidationError(ctx, validateErr)
+		}
+	}
+
 	groupUserResp, err := groupUsersController.JoinGroup(group.ID, user.ID, groupUserReq)
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))

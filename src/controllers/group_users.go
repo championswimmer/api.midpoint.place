@@ -49,6 +49,7 @@ func (c *GroupUsersController) JoinGroup(groupID string, userID uint, req *dto.G
 		}).Error; err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "Failed to add/update user in group")
 		}
+		groupUser.DeletedAt = gorm.DeletedAt{} // un-delete the user if it was deleted
 
 		// If the user is already in the group and the location has changed, update the location
 		if groupUser.Latitude != req.Latitude || groupUser.Longitude != req.Longitude {

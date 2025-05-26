@@ -7,7 +7,6 @@ import (
 	"github.com/championswimmer/api.midpoint.place/src/dto"
 	"github.com/championswimmer/api.midpoint.place/src/utils/applogger"
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -34,9 +33,9 @@ func (c *GroupPlacesController) AddPlacesToGroup(groupID string, req *dto.GroupP
 	// Create transaction to ensure atomicity
 	var responses []dto.GroupPlaceResponse
 	err := c.db.Transaction(func(tx *gorm.DB) error {
-		// First, check for existing places to avoid duplicates
+		// First, check for existing places (even if they are deleted) to avoid duplicates
 		var existingPlaceIDs []string
-		if err := tx.Model(&models.GroupPlace{}).
+		if err := tx.Unscoped().Model(&models.GroupPlace{}).
 			Where("group_id = ?", groupID).
 			Pluck("place_id", &existingPlaceIDs).Error; err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch existing places")
@@ -47,54 +46,47 @@ func (c *GroupPlacesController) AddPlacesToGroup(groupID string, req *dto.GroupP
 		for _, id := range existingPlaceIDs {
 			existingPlaceMap[id] = true
 		}
-
-		// Filter out places that already exist
 		var newPlaces []models.GroupPlace
+		var updatedPlaceIds []string
+
 		for _, place := range req.Places {
 			if existingPlaceMap[place.Id] {
-				applogger.Info("Place", place.Id, "already exists for group", groupID, "- skipping")
-				continue
-			}
-
-			// Add place to batch
-			groupPlace := models.GroupPlace{
-				ID:        uuid.New(),
-				GroupID:   groupID,
-				PlaceID:   place.Id,
-				Name:      place.Name,
-				Address:   place.Address,
-				Type:      place.Type,
-				Rating:    place.Rating,
-				MapURI:    place.MapURI,
-				Latitude:  place.Latitude,
-				Longitude: place.Longitude,
-			}
-			groupPlace.DeletedAt = gorm.DeletedAt{}
-			newPlaces = append(newPlaces, groupPlace)
-		}
-
-		// Bulk insert if there are any new places
-		if len(newPlaces) > 0 {
-			if err := tx.Save(&newPlaces).Error; err != nil {
-				return fiber.NewError(fiber.StatusInternalServerError, "Failed to add places to group")
-			}
-
-			// Prepare responses
-			for _, groupPlace := range newPlaces {
-				responses = append(responses, dto.GroupPlaceResponse{
-					ID:        groupPlace.ID.String(),
-					GroupID:   groupPlace.GroupID,
-					PlaceID:   groupPlace.PlaceID,
-					Name:      groupPlace.Name,
-					Address:   groupPlace.Address,
-					Type:      config.PlaceType(groupPlace.Type),
-					Rating:    groupPlace.Rating,
-					MapURI:    groupPlace.MapURI,
-					Latitude:  groupPlace.Latitude,
-					Longitude: groupPlace.Longitude,
+				applogger.Warn("Place", place.Id, "already exists for group", groupID, "- will try to undelete")
+				updatedPlaceIds = append(updatedPlaceIds, place.Id)
+			} else {
+				applogger.Info("Place", place.Id, "does not exist for group", groupID, "- creating")
+				newPlaces = append(newPlaces, models.GroupPlace{
+					GroupID:   groupID,
+					PlaceID:   place.Id,
+					Name:      place.Name,
+					Address:   place.Address,
+					Type:      config.PlaceType(place.Type),
+					Rating:    place.Rating,
+					MapURI:    place.MapURI,
+					Latitude:  place.Latitude,
+					Longitude: place.Longitude,
 				})
 			}
 		}
+
+		// For new places, just bulk-create them
+		if len(newPlaces) > 0 {
+			if err := tx.Create(&newPlaces).Error; err != nil {
+				applogger.Error("Failed to add new places to group", err)
+				return fiber.NewError(fiber.StatusInternalServerError, "Failed to add new places to group")
+			}
+		}
+
+		// For existing places, do a batch update to undelete them
+		if len(updatedPlaceIds) > 0 {
+			if err := tx.Unscoped().Model(&models.GroupPlace{}).
+				Where("group_id = ? AND place_id IN (?)", groupID, updatedPlaceIds).
+				Update("deleted_at", nil).Error; err != nil {
+				applogger.Error("Failed to undelete places", err)
+				return fiber.NewError(fiber.StatusInternalServerError, "Failed to undelete places")
+			}
+		}
+
 		return nil
 	})
 
@@ -115,6 +107,7 @@ func (c *GroupPlacesController) RemoveAllPlacesFromGroup(groupID string) error {
 
 	// Delete all places associated with the group
 	if err := c.db.Where("group_id = ?", groupID).Delete(&models.GroupPlace{}).Error; err != nil {
+		applogger.Error("Failed to remove places from group", err)
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to remove places from group")
 	}
 

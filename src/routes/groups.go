@@ -174,7 +174,7 @@ func joinGroup(ctx *fiber.Ctx) error {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
 
-	go _triggerGroupMidpointUpdate(group)
+	_triggerGroupMidpointUpdate(group)
 
 	return ctx.Status(fiber.StatusAccepted).JSON(groupUserResp)
 }
@@ -205,7 +205,7 @@ func leaveGroup(ctx *fiber.Ctx) error {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
 
-	go _triggerGroupMidpointUpdate(group)
+	_triggerGroupMidpointUpdate(group)
 	return ctx.Status(fiber.StatusAccepted).JSON([]byte("{}"))
 }
 

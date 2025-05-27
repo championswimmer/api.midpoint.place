@@ -21,8 +21,10 @@ type UpdateGroupMidpointRequest struct {
 }
 
 type GroupCreator struct {
-	ID          uint   `json:"id"`
-	DisplayName string `json:"display_name"`
+	ID          	uint   		`json:"id"`
+	DisplayName 	string 		`json:"display_name"`
+	Latitude    	float64 	`json:"latitude"`
+	Longitude   	float64     `json:"longitude"`
 }
 
 type GroupResponse struct {

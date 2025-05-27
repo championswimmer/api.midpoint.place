@@ -257,7 +257,7 @@ func getGroup(ctx *fiber.Ctx) error {
 // 2. delete existing group places
 // 3. populate group places (parallelly) for all place types
 func _triggerGroupMidpointUpdate(group *dto.GroupResponse) {
-	groupResp, err := _recalculateGroupMidpoint(group.ID)
+	groupResp, err := _recalculateGroupMidpoint(group.ID, group.Creator.Latitude, group.Creator.Longitude)
 	if err != nil {
 		applogger.Error("Error recalculating group location", err)
 	}
@@ -282,9 +282,9 @@ func _triggerGroupMidpointUpdate(group *dto.GroupResponse) {
 	}
 }
 
-func _recalculateGroupMidpoint(groupID string) (*dto.GroupResponse, error) {
+func _recalculateGroupMidpoint(groupID string, creatorLatitude float64, creatorLongitude float64) (*dto.GroupResponse, error) {
 	applogger.Info("Recalculating group midpoint for group", groupID)
-	centroidLatitude, centroidLongitude, err := groupUsersController.CalculateGroupCentroid(groupID)
+	centroidLatitude, centroidLongitude, err := groupUsersController.CalculateGroupCentroid(groupID, dto.Location{Latitude: creatorLatitude, Longitude: creatorLongitude})
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"math"
 	"github.com/championswimmer/api.midpoint.place/src/db"
 	"github.com/championswimmer/api.midpoint.place/src/db/models"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
@@ -104,16 +105,21 @@ func (c *GroupUsersController) LeaveGroup(groupID string, userID uint) error {
 	return nil
 }
 
-func (c *GroupUsersController) CalculateGroupCentroid(groupID string) (latitude float64, longitude float64, err error) {
+func (c *GroupUsersController) CalculateGroupCentroid(groupID string, creatorLocation dto.Location) (latitude float64, longitude float64, err error) {
 	var result struct {
 		Latitude  float64
 		Longitude float64
 	}
+
+	integerCreatorLatitude := int(math.Floor(creatorLocation.Latitude))
+	integerCreatorLongitude := int(math.Floor(creatorLocation.Longitude))
+
 	if err := c.db.Model(&models.GroupUser{}).
 		Select("AVG(latitude) as Latitude, AVG(longitude) as Longitude").
-		Where("group_id = ?", groupID).
-		Scan(&result).Error; err != nil {
-		return 0, 0, fiber.NewError(fiber.StatusInternalServerError, "Failed to calculate group centroid")
+    	Where("group_id = ?", groupID).
+    	Where("CAST(latitude AS INTEGER) = ? AND CAST(longitude AS INTEGER) = ?", integerCreatorLatitude, integerCreatorLongitude).
+   	 	Scan(&result).Error; err != nil {
+    	return 0, 0, fiber.NewError(fiber.StatusInternalServerError, "Failed to calculate group centroid")
 	}
 
 	return result.Latitude, result.Longitude, nil

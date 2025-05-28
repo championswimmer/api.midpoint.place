@@ -8,6 +8,7 @@ import (
 	"github.com/championswimmer/api.midpoint.place/src/db/models"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
 	"github.com/championswimmer/api.midpoint.place/src/security"
+	"github.com/championswimmer/api.midpoint.place/src/security/ratelimit"
 	"github.com/championswimmer/api.midpoint.place/src/server/parsers"
 	"github.com/championswimmer/api.midpoint.place/src/server/validators"
 	"github.com/gofiber/fiber/v2"
@@ -20,7 +21,7 @@ func UsersRoute() func(router fiber.Router) {
 	usersController = controllers.CreateUsersController()
 
 	return func(router fiber.Router) {
-		router.Post("/", registerUser)
+		router.Post("/", ratelimit.UserCreateRateLimiter(), registerUser)
 		router.Post("/login", loginUser)
 		router.Post("/:userid", security.MandatoryJwtAuthMiddleware, updateUserData)
 	}

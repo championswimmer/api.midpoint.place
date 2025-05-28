@@ -26,7 +26,11 @@ require (
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
+	github.com/philhofer/fwd v1.1.3-0.20240916144458-20a13a1f6b7c // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/swaggo/files/v2 v2.0.2 // indirect
+	github.com/tinylib/msgp v1.2.5 // indirect
+	github.com/ulule/limiter/v3 v3.11.2 // indirect
 	github.com/umahmood/haversine v0.0.0-20151105152445-808ab04add26 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect

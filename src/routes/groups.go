@@ -6,6 +6,7 @@ import (
 	"github.com/championswimmer/api.midpoint.place/src/db/models"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
 	"github.com/championswimmer/api.midpoint.place/src/security"
+	"github.com/championswimmer/api.midpoint.place/src/security/ratelimit"
 	"github.com/championswimmer/api.midpoint.place/src/server/parsers"
 	"github.com/championswimmer/api.midpoint.place/src/server/validators"
 	"github.com/championswimmer/api.midpoint.place/src/services"
@@ -26,7 +27,7 @@ func GroupsRoute() func(router fiber.Router) {
 
 	return func(router fiber.Router) {
 		router.Get("/", security.MandatoryJwtAuthMiddleware, listPublicGroups)
-		router.Post("/", security.MandatoryJwtAuthMiddleware, createGroup)
+		router.Post("/", security.MandatoryJwtAuthMiddleware, ratelimit.GroupCreateRateLimiter(), createGroup)
 		router.Get("/:groupIdOrCode", security.MandatoryJwtAuthMiddleware, getGroup)
 		router.Patch("/:groupIdOrCode", security.MandatoryJwtAuthMiddleware, updateGroup)
 		router.Put("/:groupIdOrCode/join", security.MandatoryJwtAuthMiddleware, joinGroup)
@@ -65,40 +66,6 @@ func listPublicGroups(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(groups)
-}
-
-// @Summary Create a new group
-// @Description Create a new group
-// @Tags groups
-// @ID create-group
-// @Accept json
-// @Produce json
-// @Param group body dto.CreateGroupRequest true "Group"
-// @Success 201 {object} dto.GroupResponse "Group created successfully"
-// @Failure 400 {object} dto.ErrorResponse "Invalid request"
-// @Failure 422 {object} dto.ErrorResponse "Group info validation failed"
-// @Failure 500 {object} dto.ErrorResponse "Failed to create group"
-// @Router /groups [post]
-// @Security BearerAuth
-func createGroup(ctx *fiber.Ctx) error {
-	user := ctx.Locals(config.LOCALS_USER).(*models.User)
-
-	req, parseError := parsers.ParseBody[dto.CreateGroupRequest](ctx)
-	if parseError != nil {
-		return parsers.SendParsingError(ctx, parseError)
-	}
-
-	validateErr := validators.ValidateCreateGroupRequest(req)
-	if validateErr != nil {
-		return validators.SendValidationError(ctx, validateErr)
-	}
-
-	group, err := groupsController.CreateGroup(user.ID, req)
-	if err != nil {
-		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
-	}
-
-	return ctx.Status(fiber.StatusCreated).JSON(group)
 }
 
 // @Summary Update an existing group
@@ -331,4 +298,37 @@ func _populateGroupPlaces(group *dto.GroupResponse, placeType config.PlaceType) 
 		return err
 	}
 	return nil
+}
+
+// @Summary Create a new group
+// @Description Create a new group with the authenticated user as the creator
+// @Tags groups
+// @ID create-group
+// @Accept json
+// @Produce json
+// @Param group body dto.CreateGroupRequest true "Group Data"
+// @Success 201 {object} dto.GroupResponse "Group created successfully"
+// @Failure 400 {object} dto.ErrorResponse "Invalid request"
+// @Failure 500 {object} dto.ErrorResponse "Failed to create group"
+// @Router /groups [post]
+// @Security BearerAuth
+func createGroup(ctx *fiber.Ctx) error {
+	user := ctx.Locals(config.LOCALS_USER).(*models.User)
+
+	req, parseError := parsers.ParseBody[dto.CreateGroupRequest](ctx)
+	if parseError != nil {
+		return parsers.SendParsingError(ctx, parseError)
+	}
+
+	validateErr := validators.ValidateCreateGroupRequest(req)
+	if validateErr != nil {
+		return validators.SendValidationError(ctx, validateErr)
+	}
+
+	group, err := groupsController.CreateGroup(user.ID, req)
+	if err != nil {
+		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
+	}
+
+	return ctx.Status(fiber.StatusCreated).JSON(group)
 }

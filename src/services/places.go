@@ -34,27 +34,22 @@ var googlePlacesClientOnce sync.Once
 
 func GetGooglePlacesClient() PlacesClientInterface {
 	googlePlacesClientOnce.Do(func() {
-		if config.Env == "production" {
+		if config.Env == "production" || !config.UseMockPlaces {
 			if config.GoogleMapsAPIKey == "" {
-				applogger.Fatal("Google Maps API key is required in production")
+				if config.Env == "production" {
+					applogger.Fatal("Google Maps API key is required in production")
+				}
+				applogger.Warn("No Google Maps API key provided, using mock Places client")
+				googlePlacesClient = NewMockPlacesClient()
+				return
 			}
-			applogger.Info("Using real Places client in production")
+			applogger.Info("Using real Places client")
 			clientOpts := []option.ClientOption{option.WithAPIKey(config.GoogleMapsAPIKey)}
 			realClient := lo.Must(places.NewClient(context.Background(), clientOpts...))
 			googlePlacesClient = &RealPlacesClient{client: realClient}
 		} else {
-			if config.UseMockPlaces {
-				applogger.Info("Using mock Places client (USE_MOCK_PLACES=true)")
-				googlePlacesClient = NewMockPlacesClient()
-			} else if config.GoogleMapsAPIKey == "" {
-				applogger.Warn("No Google Maps API key provided, using mock Places client")
-				googlePlacesClient = NewMockPlacesClient()
-			} else {
-				applogger.Info("Using real Places client")
-				clientOpts := []option.ClientOption{option.WithAPIKey(config.GoogleMapsAPIKey)}
-				realClient := lo.Must(places.NewClient(context.Background(), clientOpts...))
-				googlePlacesClient = &RealPlacesClient{client: realClient}
-			}
+			applogger.Info("Using mock Places client (USE_MOCK_PLACES=true)")
+			googlePlacesClient = NewMockPlacesClient()
 		}
 	})
 

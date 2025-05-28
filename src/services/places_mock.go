@@ -5,6 +5,7 @@ import (
 
 	placespb "cloud.google.com/go/maps/places/apiv1/placespb"
 	"google.golang.org/genproto/googleapis/type/latlng"
+	"google.golang.org/genproto/googleapis/type/localized_text"
 )
 
 type MockPlacesClient struct{}
@@ -19,9 +20,10 @@ func (m *MockPlacesClient) SearchNearby(ctx context.Context, req *placespb.Searc
 
 	mockPlaces := []*placespb.Place{
 		{
-			Id:                    "mock_place_1",
-			Name:                  "Mock " + placeType,
-			DisplayName:           nil,
+			Id: "mock_place_1",
+			DisplayName: &localized_text.LocalizedText{
+				Text: "Mock " + placeType,
+			},
 			ShortFormattedAddress: "123 Mock Street",
 			GoogleMapsUri:         "https://maps.google.com/mock",
 			Location: &latlng.LatLng{
@@ -31,9 +33,10 @@ func (m *MockPlacesClient) SearchNearby(ctx context.Context, req *placespb.Searc
 			Rating: 4.5,
 		},
 		{
-			Id:                    "mock_place_2",
-			Name:                  "Another Mock " + placeType,
-			DisplayName:           nil,
+			Id: "mock_place_2",
+			DisplayName: &localized_text.LocalizedText{
+				Text: "Another Mock " + placeType,
+			},
 			ShortFormattedAddress: "456 Mock Avenue",
 			GoogleMapsUri:         "https://maps.google.com/mock2",
 			Location: &latlng.LatLng{
@@ -43,9 +46,10 @@ func (m *MockPlacesClient) SearchNearby(ctx context.Context, req *placespb.Searc
 			Rating: 4.0,
 		},
 		{
-			Id:                    "mock_place_3",
-			Name:                  "Third Mock " + placeType,
-			DisplayName:           nil,
+			Id: "mock_place_3",
+			DisplayName: &localized_text.LocalizedText{
+				Text: "Third Mock " + placeType,
+			},
 			ShortFormattedAddress: "789 Mock Road",
 			GoogleMapsUri:         "https://maps.google.com/mock3",
 			Location: &latlng.LatLng{

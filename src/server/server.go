@@ -22,6 +22,7 @@ import (
 func CreateServer() *fiber.App {
 	app := fiber.New(fiber.Config{
 		// Prefork: true,
+		ProxyHeader: fiber.HeaderXForwardedFor
 	})
 
 	app.Use(logger.New(logger.Config{

@@ -119,7 +119,7 @@ func createGroup(ctx *fiber.Ctx) error {
 func updateGroup(ctx *fiber.Ctx) error {
 	groupID := ctx.Params("groupIdOrCode")
 
-	group, err := groupsController.GetGroupByIDorCode(groupID, false, false)
+	group, err := groupsController.GetGroupByIDorCode(groupID, true, false)
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
@@ -132,6 +132,28 @@ func updateGroup(ctx *fiber.Ctx) error {
 	validateErr := validators.ValidateUpdateGroupRequest(req)
 	if validateErr != nil {
 		return validators.SendValidationError(ctx, validateErr)
+	}
+
+	if req.Type != "" && req.Type != group.Type {
+		memberCount := len(group.Members)
+
+		if memberCount > 1 {
+			privacyLevels := map[config.GroupType]int{
+				config.GroupTypePublic:    1,
+				config.GroupTypeProtected: 2,
+				config.GroupTypePrivate:   3,
+			}
+
+			currentLevel := privacyLevels[group.Type]
+			newLevel := privacyLevels[req.Type]
+
+			if newLevel <= currentLevel {
+				return ctx.Status(fiber.StatusForbidden).JSON(dto.CreateErrorResponse(
+					fiber.StatusForbidden,
+					"to prevent privacy invasion, cannot make group more open!",
+				))
+			}
+		}
 	}
 
 	group, err = groupsController.UpdateGroup(group.ID, req)

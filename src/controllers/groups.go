@@ -99,6 +99,8 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 		Creator: dto.GroupCreator{
 			ID:          group.Creator.ID,
 			DisplayName: group.Creator.DisplayName,
+			Latitude: group.Creator.Latitude,
+			Longitude: group.Creator.Longitude,
 		},
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,

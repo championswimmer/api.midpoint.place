@@ -4,6 +4,7 @@ import (
 	"github.com/championswimmer/api.midpoint.place/src/db"
 	"github.com/championswimmer/api.midpoint.place/src/db/models"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
+	haversine "github.com/championswimmer/api.midpoint.place/src/utils"
 	"github.com/championswimmer/api.midpoint.place/src/utils/applogger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/samber/lo"
@@ -33,8 +34,15 @@ func (c *GroupUsersController) JoinGroup(groupID string, userID uint, req *dto.G
 
 	// Check if group exists
 	var group models.Group
-	if err := c.db.First(&group, "id = ?", groupID).Error; err != nil {
+	if err := c.db.Preload("Creator").First(&group, "id = ?", groupID).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
+	}
+
+	applogger.Info("Calculating distance from creator's location")
+	var haversineDistance = haversine.Haversine(group.Creator.Latitude, group.Creator.Longitude, req.Latitude, req.Longitude)
+
+	if haversineDistance > float64(group.Radius) {
+		return nil, fiber.NewError(fiber.StatusBadRequest, "You are too far from the creator's location. Please choose a closer location.")
 	}
 
 	// Check if the user is already in the group and update their location if necessary
@@ -60,6 +68,7 @@ func (c *GroupUsersController) JoinGroup(groupID string, userID uint, req *dto.G
 			}
 			applogger.Warn("User", userID, "is already in group", groupID, "- updating location")
 		}
+
 		applogger.Info("Joining group", groupID, "for user", userID, "transaction completed")
 		return nil
 	})

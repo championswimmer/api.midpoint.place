@@ -18,5 +18,5 @@ func Haversine(lat1, lon1, lat2, lon2 float64) float64 {
 
 	c := 2 * math.Asin(math.Sqrt(a))
 
-	return R * c * 1000 // haversine distance in meteres
+	return R * c * 1000 // haversine distance in meters
 }

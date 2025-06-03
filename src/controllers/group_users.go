@@ -38,6 +38,13 @@ func (c *GroupUsersController) JoinGroup(groupID string, userID uint, req *dto.G
 		return nil, fiber.NewError(fiber.StatusNotFound, "Group not found")
 	}
 
+	applogger.Info("Calculating distance from creator's location")
+	var haversineDistance = haversine.Haversine(group.Creator.Latitude, group.Creator.Longitude, req.Latitude, req.Longitude)
+
+	if haversineDistance > float64(group.Radius) {
+		return nil, fiber.NewError(fiber.StatusBadRequest, "You are too far from the creator's location. Please choose a closer location.")
+	}
+
 	// Check if the user is already in the group and update their location if necessary
 	var groupUser models.GroupUser
 	err := c.db.Transaction(func(tx *gorm.DB) error {
@@ -60,13 +67,6 @@ func (c *GroupUsersController) JoinGroup(groupID string, userID uint, req *dto.G
 				return fiber.NewError(fiber.StatusInternalServerError, "Failed to update user location in group")
 			}
 			applogger.Warn("User", userID, "is already in group", groupID, "- updating location")
-		}
-
-		applogger.Info("Calculating distance from creator's location")
-		var haversineDistance = haversine.Haversine(group.Creator.Latitude, group.Creator.Longitude, req.Latitude, req.Longitude)
-
-		if haversineDistance > float64(group.Radius) {
-			return fiber.NewError(fiber.StatusBadRequest, "You are too far from the creator's location. Please choose a closer location.")
 		}
 
 		applogger.Info("Joining group", groupID, "for user", userID, "transaction completed")

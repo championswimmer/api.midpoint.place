@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
 	"github.com/gofiber/fiber/v2"
 	"github.com/umahmood/haversine"
@@ -44,6 +45,32 @@ func validateRadius(radius int) *ValidationError {
 	return nil
 }
 
+func validatePlaceTypes(placeTypes []config.PlaceType) *ValidationError {
+	if len(placeTypes) == 0 {
+		return nil
+	}
+	if len(placeTypes) > 10 {
+		return &ValidationError{
+			status:  fiber.StatusUnprocessableEntity,
+			message: "Cannot select more than 10 place types",
+		}
+	}
+	// Validate each place type is valid
+	validTypes := make(map[config.PlaceType]bool)
+	for _, validType := range config.AllPlaceTypes {
+		validTypes[validType] = true
+	}
+	for _, placeType := range placeTypes {
+		if !validTypes[placeType] {
+			return &ValidationError{
+				status:  fiber.StatusUnprocessableEntity,
+				message: "Invalid place type: " + string(placeType),
+			}
+		}
+	}
+	return nil
+}
+
 func ValidateCreateGroupRequest(req *dto.CreateGroupRequest) *ValidationError {
 	if err := validateName(req.Name); err != nil {
 		return err
@@ -52,6 +79,9 @@ func ValidateCreateGroupRequest(req *dto.CreateGroupRequest) *ValidationError {
 		return err
 	}
 	if err := validateRadius(req.Radius); err != nil {
+		return err
+	}
+	if err := validatePlaceTypes(req.PlaceTypes); err != nil {
 		return err
 	}
 	// Add any other specific validations for CreateGroupRequest
@@ -71,6 +101,11 @@ func ValidateUpdateGroupRequest(req *dto.UpdateGroupRequest) *ValidationError {
 	}
 	if req.Radius > 0 { // Only validate if provided for update and positive
 		if err := validateRadius(req.Radius); err != nil {
+			return err
+		}
+	}
+	if len(req.PlaceTypes) > 0 { // Only validate if provided for update
+		if err := validatePlaceTypes(req.PlaceTypes); err != nil {
 			return err
 		}
 	}

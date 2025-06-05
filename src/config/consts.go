@@ -27,4 +27,15 @@ const (
 	PlaceTypeBar        PlaceType = "bar"
 	PlaceTypeCafe       PlaceType = "cafe"
 	PlaceTypePark       PlaceType = "park"
+	PlaceTypeMuseum     PlaceType = "museum"
+	PlaceTypeBookstore  PlaceType = "bookstore"
 )
+
+var AllPlaceTypes = []PlaceType{
+	PlaceTypeRestaurant,
+	PlaceTypeBar,
+	PlaceTypeCafe,
+	PlaceTypePark,
+	PlaceTypeMuseum,
+	PlaceTypeBookstore,
+}

@@ -54,20 +54,29 @@ func validatePlaceTypes(placeTypes []config.PlaceType) *ValidationError {
 			status:  fiber.StatusUnprocessableEntity,
 			message: "Cannot select more than 10 place types",
 		}
-	}
-	// Validate each place type is valid
-	validTypes := make(map[config.PlaceType]bool)
-	for _, validType := range config.AllPlaceTypes {
-		validTypes[validType] = true
-	}
-	for _, placeType := range placeTypes {
-		if !validTypes[placeType] {
-			return &ValidationError{
-				status:  fiber.StatusUnprocessableEntity,
-				message: "Invalid place type: " + string(placeType),
-			}
-		}
-	}
+    }
+    // Validate each place type is valid and unique
+    validTypes := make(map[config.PlaceType]bool)
+    for _, validType := range config.AllPlaceTypes {
+        validTypes[validType] = true
+    }
+    
+    seenTypes := make(map[config.PlaceType]bool)
+    for _, placeType := range placeTypes {
+        if !validTypes[placeType] {
+            return &ValidationError{
+                status:  fiber.StatusUnprocessableEntity,
+                message: "Invalid place type: " + string(placeType),
+            }
+        }
+        if seenTypes[placeType] {
+            return &ValidationError{
+                status:  fiber.StatusUnprocessableEntity,
+                message: "Duplicate place type: " + string(placeType),
+            }
+        }
+        seenTypes[placeType] = true
+    }
 	return nil
 }
 

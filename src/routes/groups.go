@@ -101,8 +101,8 @@ func updateGroup(ctx *fiber.Ctx) error {
 		return validators.SendValidationError(ctx, validateErr)
 	}
 
-	// Check if place types are being updated to trigger place refresh
-	placeTypesUpdated := len(req.PlaceTypes) > 0
+ // Check if place types are being updated to trigger place refresh
+ placeTypesUpdated := len(req.PlaceTypes) > 0 && !slicesEqual(req.PlaceTypes, group.PlaceTypes)
 
 	group, err = groupsController.UpdateGroup(group.ID, req)
 	if err != nil {

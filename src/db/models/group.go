@@ -27,9 +27,10 @@ type Group struct {
 	MidpointLatitude  float64          `gorm:"type:decimal(10,8);not null;default:0"`
 	MidpointLongitude float64          `gorm:"type:decimal(11,8);not null;default:0"`
 	// Radius in meters
-	Radius  int          `gorm:"type:integer;not null;default:2000"`
-	Places  []GroupPlace `gorm:"foreignKey:GroupID"`
-	Members []GroupUser  `gorm:"foreignKey:GroupID"`
+	Radius     int               `gorm:"type:integer;not null;default:2000"`
+	PlaceTypes []config.PlaceType `gorm:"type:text;serializer:json"`
+	Places     []GroupPlace      `gorm:"foreignKey:GroupID"`
+	Members    []GroupUser       `gorm:"foreignKey:GroupID"`
 }
 
 func (Group) TableName() string {

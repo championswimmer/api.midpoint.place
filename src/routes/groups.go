@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"slices"
+
 	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/controllers"
 	"github.com/championswimmer/api.midpoint.place/src/db/models"
@@ -101,8 +103,8 @@ func updateGroup(ctx *fiber.Ctx) error {
 		return validators.SendValidationError(ctx, validateErr)
 	}
 
- // Check if place types are being updated to trigger place refresh
- placeTypesUpdated := len(req.PlaceTypes) > 0 && !slicesEqual(req.PlaceTypes, group.PlaceTypes)
+	// Check if place types are being updated to trigger place refresh
+	placeTypesUpdated := len(req.PlaceTypes) > 0 && !slices.Equal(req.PlaceTypes, group.PlaceTypes)
 
 	group, err = groupsController.UpdateGroup(group.ID, req)
 	if err != nil {

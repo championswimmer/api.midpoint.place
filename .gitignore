@@ -43,3 +43,6 @@ app.db
 
 # Binary 
 /bin/*
+
+# DB Backups 
+/db_backups

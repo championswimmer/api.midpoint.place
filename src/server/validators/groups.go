@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
 	"github.com/gofiber/fiber/v2"
 	"github.com/umahmood/haversine"
@@ -44,6 +45,24 @@ func validateRadius(radius int) *ValidationError {
 	return nil
 }
 
+func validatePlaceTypes(placeTypes []config.PlaceType) *ValidationError {
+	if len(placeTypes) == 0 {
+		return &ValidationError{
+			status:  fiber.StatusUnprocessableEntity,
+			message: "At least one place type must be selected",
+		}
+	}
+	for _, placeType := range placeTypes {
+		if !config.IsSupportedPlaceType(placeType) {
+			return &ValidationError{
+				status:  fiber.StatusUnprocessableEntity,
+				message: "Invalid place type",
+			}
+		}
+	}
+	return nil
+}
+
 func ValidateCreateGroupRequest(req *dto.CreateGroupRequest) *ValidationError {
 	if err := validateName(req.Name); err != nil {
 		return err
@@ -53,6 +72,11 @@ func ValidateCreateGroupRequest(req *dto.CreateGroupRequest) *ValidationError {
 	}
 	if err := validateRadius(req.Radius); err != nil {
 		return err
+	}
+	if len(req.PlaceTypes) > 0 {
+		if err := validatePlaceTypes(req.PlaceTypes); err != nil {
+			return err
+		}
 	}
 	// Add any other specific validations for CreateGroupRequest
 	return nil
@@ -71,6 +95,11 @@ func ValidateUpdateGroupRequest(req *dto.UpdateGroupRequest) *ValidationError {
 	}
 	if req.Radius > 0 { // Only validate if provided for update and positive
 		if err := validateRadius(req.Radius); err != nil {
+			return err
+		}
+	}
+	if req.PlaceTypes != nil {
+		if err := validatePlaceTypes(*req.PlaceTypes); err != nil {
 			return err
 		}
 	}

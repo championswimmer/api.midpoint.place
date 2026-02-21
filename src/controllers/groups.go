@@ -22,6 +22,13 @@ type GroupsController struct {
 	db *gorm.DB
 }
 
+func getGroupPlaceTypesOrDefault(placeTypes []config.PlaceType) []config.PlaceType {
+	if len(placeTypes) == 0 {
+		return append([]config.PlaceType{}, config.DefaultGroupPlaceTypes...)
+	}
+	return placeTypes
+}
+
 func CreateGroupsController() *GroupsController {
 	appDb := db.GetAppDB()
 	return &GroupsController{
@@ -116,6 +123,7 @@ func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
 		Radius:            group.Radius,
+		PlaceTypes:        getGroupPlaceTypesOrDefault(group.PlaceTypes),
 	}
 
 	if includeUsers {
@@ -169,14 +177,16 @@ func (c *GroupsController) CreateGroup(creatorID uint, req *dto.CreateGroupReque
 	}
 
 	// Create new group
+	placeTypes := getGroupPlaceTypesOrDefault(req.PlaceTypes)
 	group := models.Group{
-		ID:        uuid.New().String(),
-		CreatorID: creatorID,
-		Name:      req.Name,
-		Type:      groupType,
-		Code:      code,
-		Secret:    secret,
-		Radius:    req.Radius,
+		ID:         uuid.New().String(),
+		CreatorID:  creatorID,
+		Name:       req.Name,
+		Type:       groupType,
+		Code:       code,
+		Secret:     secret,
+		Radius:     req.Radius,
+		PlaceTypes: placeTypes,
 	}
 
 	if err := c.db.Create(&group).Error; err != nil {
@@ -201,6 +211,7 @@ func (c *GroupsController) CreateGroup(creatorID uint, req *dto.CreateGroupReque
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
 		Radius:            group.Radius,
+		PlaceTypes:        getGroupPlaceTypesOrDefault(group.PlaceTypes),
 	}, nil
 }
 
@@ -240,6 +251,9 @@ func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupReque
 	if req.Radius > 0 {
 		group.Radius = req.Radius
 	}
+	if req.PlaceTypes != nil {
+		group.PlaceTypes = *req.PlaceTypes
+	}
 
 	if err := c.db.Save(&group).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to update group")
@@ -257,6 +271,7 @@ func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupReque
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
 		Radius:            group.Radius,
+		PlaceTypes:        getGroupPlaceTypesOrDefault(group.PlaceTypes),
 	}, nil
 }
 
@@ -286,6 +301,7 @@ func (c *GroupsController) UpdateGroupMidpoint(groupID string, req *dto.UpdateGr
 		MidpointLatitude:  group.MidpointLatitude,
 		MidpointLongitude: group.MidpointLongitude,
 		Radius:            group.Radius,
+		PlaceTypes:        getGroupPlaceTypesOrDefault(group.PlaceTypes),
 	}, nil
 }
 
@@ -321,6 +337,7 @@ func (c *GroupsController) GetGroupsByCreator(creatorID uint) ([]dto.GroupRespon
 			MidpointLatitude:  gwc.Group.MidpointLatitude,
 			MidpointLongitude: gwc.Group.MidpointLongitude,
 			Radius:            gwc.Group.Radius,
+			PlaceTypes:        getGroupPlaceTypesOrDefault(gwc.Group.PlaceTypes),
 			MemberCount:       gwc.MemberCount,
 		}
 	})
@@ -363,6 +380,7 @@ func (c *GroupsController) GetPublicGroups(limit int) ([]dto.GroupResponse, erro
 			MidpointLatitude:  gwc.Group.MidpointLatitude,
 			MidpointLongitude: gwc.Group.MidpointLongitude,
 			Radius:            gwc.Group.Radius,
+			PlaceTypes:        getGroupPlaceTypesOrDefault(gwc.Group.PlaceTypes),
 			MemberCount:       gwc.MemberCount,
 		}
 	})

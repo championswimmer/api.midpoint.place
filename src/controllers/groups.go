@@ -215,7 +215,9 @@ func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupReque
 		group.Name = req.Name
 	}
 	if req.Type != "" {
-		if groupTypePrivacyLevel(req.Type) < groupTypePrivacyLevel(group.Type) {
+		newTypePrivacyLevel := groupTypePrivacyLevel(req.Type)
+		currentTypePrivacyLevel := groupTypePrivacyLevel(group.Type)
+		if newTypePrivacyLevel >= 0 && currentTypePrivacyLevel >= 0 && newTypePrivacyLevel < currentTypePrivacyLevel {
 			var memberCount int64
 			if err := c.db.Model(&models.GroupUser{}).
 				Where("group_id = ?", group.ID).
@@ -224,7 +226,7 @@ func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupReque
 				return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch group member count")
 			}
 			if memberCount > 1 {
-				return nil, fiber.NewError(fiber.StatusUnprocessableEntity, "Cannot make group privacy more open when group has more than 1 member")
+				return nil, fiber.NewError(fiber.StatusUnprocessableEntity, "Cannot make group privacy more open when group has 2 or more members")
 			}
 		}
 		group.Type = req.Type

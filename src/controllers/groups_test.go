@@ -74,6 +74,16 @@ func TestUpdateGroup_AllowsOpeningPrivacy_WhenMemberCountIsAtMostOne(t *testing.
 	assert.Equal(t, config.GroupTypePublic, resp.Type)
 }
 
+func TestUpdateGroup_AllowsOpeningPrivacy_WhenMemberCountIsZero(t *testing.T) {
+	db := setupGroupsControllerTestDB(t)
+	controller := &GroupsController{db: db}
+	group := createGroupFixture(t, db, config.GroupTypePrivate)
+
+	resp, err := controller.UpdateGroup(group.ID, &dto.UpdateGroupRequest{Type: config.GroupTypePublic})
+	require.NoError(t, err)
+	assert.Equal(t, config.GroupTypePublic, resp.Type)
+}
+
 func TestUpdateGroup_BlocksOpeningPrivacy_WhenMemberCountIsMoreThanOne(t *testing.T) {
 	db := setupGroupsControllerTestDB(t)
 	controller := &GroupsController{db: db}

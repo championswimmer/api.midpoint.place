@@ -7,7 +7,7 @@ type CreateGroupRequest struct {
 	Type       config.GroupType   `json:"type" validate:"omitempty,oneof=public protected private"`
 	Secret     string             `json:"secret" validate:"omitempty"`
 	Radius     int                `json:"radius" validate:"omitempty,min=0"`
-	PlaceTypes []config.PlaceType `json:"place_types" validate:"omitempty,dive,oneof=restaurant bar cafe park museum bookstore"`
+	PlaceTypes []config.PlaceType `json:"place_types" validate:"omitempty"`
 }
 
 type UpdateGroupRequest struct {
@@ -15,7 +15,7 @@ type UpdateGroupRequest struct {
 	Type       config.GroupType    `json:"type" validate:"omitempty,oneof=public protected private"`
 	Secret     string              `json:"secret" validate:"omitempty"`
 	Radius     int                 `json:"radius" validate:"omitempty,min=0"`
-	PlaceTypes *[]config.PlaceType `json:"place_types" validate:"omitempty,dive,oneof=restaurant bar cafe park museum bookstore"`
+	PlaceTypes *[]config.PlaceType `json:"place_types" validate:"omitempty"`
 }
 
 type UpdateGroupMidpointRequest struct {

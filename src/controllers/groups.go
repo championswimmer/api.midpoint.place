@@ -24,7 +24,7 @@ type GroupsController struct {
 
 func getGroupPlaceTypesOrDefault(placeTypes []config.PlaceType) []config.PlaceType {
 	if len(placeTypes) == 0 {
-		return append([]config.PlaceType{}, config.DefaultGroupPlaceTypes...)
+		return config.DefaultGroupPlaceTypes()
 	}
 	return placeTypes
 }

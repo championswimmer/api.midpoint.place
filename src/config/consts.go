@@ -31,11 +31,13 @@ const (
 	PlaceTypeBookstore  PlaceType = "bookstore"
 )
 
-var DefaultGroupPlaceTypes = []PlaceType{
-	PlaceTypeRestaurant,
-	PlaceTypeBar,
-	PlaceTypeCafe,
-	PlaceTypePark,
+func DefaultGroupPlaceTypes() []PlaceType {
+	return []PlaceType{
+		PlaceTypeRestaurant,
+		PlaceTypeBar,
+		PlaceTypeCafe,
+		PlaceTypePark,
+	}
 }
 
 func IsSupportedPlaceType(placeType PlaceType) bool {

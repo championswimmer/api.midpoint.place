@@ -29,7 +29,7 @@ const fieldsToRequest = "places.id,places.displayName,places.formattedAddress,pl
 
 func (s *PlaceSearchService) NearbyPlaces(location dto.Location, radius int, placeType config.PlaceType) ([]dto.Place, error) {
 	if s.placesClient == nil {
-		return _mockNearbyPlaces(location, placeType), nil
+		return mockNearbyPlaces(location, placeType), nil
 	}
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "x-goog-fieldmask", fieldsToRequest)
@@ -64,7 +64,7 @@ func (s *PlaceSearchService) NearbyPlaces(location dto.Location, radius int, pla
 	return places, nil
 }
 
-func _mockNearbyPlaces(location dto.Location, placeType config.PlaceType) []dto.Place {
+func mockNearbyPlaces(location dto.Location, placeType config.PlaceType) []dto.Place {
 	return []dto.Place{
 		{
 			Id:      fmt.Sprintf("mock-%s-1", placeType),

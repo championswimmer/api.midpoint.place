@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"sync"
 
 	places "cloud.google.com/go/maps/places/apiv1"
@@ -19,7 +19,7 @@ func GetGooglePlacesClient() *places.Client {
 	googlePlacesClientOnce.Do(func() {
 		if config.GoogleMapsAPIKey == "" {
 			if config.Env == "production" {
-				panic(fmt.Errorf("GOOGLE_MAPS_API_KEY must be set in production"))
+				panic(errors.New("GOOGLE_MAPS_API_KEY must be set in production"))
 			}
 			return
 		}

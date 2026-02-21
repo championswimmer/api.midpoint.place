@@ -41,8 +41,10 @@ func main() {
 		server.ShutdownWithContext(ctx)
 
 		// close places client
-		applogger.Info("Closing places client...")
-		lo.Must0(placesClient.Close())
+		if placesClient != nil {
+			applogger.Info("Closing places client...")
+			lo.Must0(placesClient.Close())
+		}
 
 		// shutdown db
 		applogger.Info("Closing db connection...")

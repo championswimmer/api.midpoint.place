@@ -25,3 +25,17 @@ func TestPlaceSearchService_NearbyPlaces(t *testing.T) {
 		applogger.Info("place", place)
 	})
 }
+
+func TestPlaceSearchService_NearbyPlaces_MocksWhenClientMissing(t *testing.T) {
+	placeSearchService := &PlaceSearchService{}
+
+	places, err := placeSearchService.NearbyPlaces(dto.Location{
+		Latitude:  28.6139,
+		Longitude: 77.2090,
+	}, 1000, config.PlaceTypePark)
+
+	assert.NoError(t, err)
+	assert.Len(t, places, 3)
+	assert.Equal(t, "mock-park-1", places[0].Id)
+	assert.Equal(t, config.PlaceTypePark, places[0].Type)
+}

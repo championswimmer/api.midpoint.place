@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	places "cloud.google.com/go/maps/places/apiv1"
 	placespb "cloud.google.com/go/maps/places/apiv1/placespb"
@@ -27,6 +28,9 @@ func NewPlaceSearchService() *PlaceSearchService {
 const fieldsToRequest = "places.id,places.displayName,places.formattedAddress,places.googleMapsUri,places.primaryTypeDisplayName,places.rating,places.location,places.shortFormattedAddress"
 
 func (s *PlaceSearchService) NearbyPlaces(location dto.Location, radius int, placeType config.PlaceType) ([]dto.Place, error) {
+	if s.placesClient == nil {
+		return _mockNearbyPlaces(location, placeType), nil
+	}
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "x-goog-fieldmask", fieldsToRequest)
 
@@ -58,6 +62,47 @@ func (s *PlaceSearchService) NearbyPlaces(location dto.Location, radius int, pla
 	})
 
 	return places, nil
+}
+
+func _mockNearbyPlaces(location dto.Location, placeType config.PlaceType) []dto.Place {
+	return []dto.Place{
+		{
+			Id:      fmt.Sprintf("mock-%s-1", placeType),
+			Name:    fmt.Sprintf("Mock %s Place 1", placeType),
+			Address: "Mock Address 1",
+			MapURI:  "https://maps.google.com",
+			Type:    placeType,
+			Rating:  4.5,
+			Location: dto.Location{
+				Latitude:  location.Latitude,
+				Longitude: location.Longitude,
+			},
+		},
+		{
+			Id:      fmt.Sprintf("mock-%s-2", placeType),
+			Name:    fmt.Sprintf("Mock %s Place 2", placeType),
+			Address: "Mock Address 2",
+			MapURI:  "https://maps.google.com",
+			Type:    placeType,
+			Rating:  4.3,
+			Location: dto.Location{
+				Latitude:  location.Latitude + 0.001,
+				Longitude: location.Longitude + 0.001,
+			},
+		},
+		{
+			Id:      fmt.Sprintf("mock-%s-3", placeType),
+			Name:    fmt.Sprintf("Mock %s Place 3", placeType),
+			Address: "Mock Address 3",
+			MapURI:  "https://maps.google.com",
+			Type:    placeType,
+			Rating:  4.1,
+			Location: dto.Location{
+				Latitude:  location.Latitude - 0.001,
+				Longitude: location.Longitude - 0.001,
+			},
+		},
+	}
 }
 
 func _getIncludedTypes(placeType config.PlaceType) []string {

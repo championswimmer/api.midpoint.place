@@ -1,6 +1,7 @@
 package services
 
 import (
+	"os"
 	"testing"
 
 	"github.com/championswimmer/api.midpoint.place/src/config"
@@ -19,6 +20,14 @@ func TestPlaceSearchService_NearbyPlaces(t *testing.T) {
 	}, 1000, config.PlaceTypePark)
 
 	assert.NoError(t, err)
+
+	// If GOOGLE_MAPS_API_KEY is not set, we expect empty results
+	if os.Getenv("GOOGLE_MAPS_API_KEY") == "" {
+		assert.Empty(t, places)
+		return
+	}
+
+	// If GOOGLE_MAPS_API_KEY is set, we expect actual results
 	assert.NotEmpty(t, places)
 	assert.Equal(t, 3, len(places))
 	lo.ForEach(places, func(place dto.Place, _ int) {

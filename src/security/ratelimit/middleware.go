@@ -1,6 +1,7 @@
 package ratelimit
 
 import (
+	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -9,6 +10,13 @@ import (
 
 // GlobalRateLimiter creates a new rate limiter for global requests.
 func GlobalRateLimiter() fiber.Handler {
+	// Disable rate limiting in test environment
+	if os.Getenv("ENV") == "test" {
+		return func(c *fiber.Ctx) error {
+			return c.Next()
+		}
+	}
+
 	return limiter.New(limiter.Config{
 		Max:        5,
 		Expiration: 1 * time.Second,
@@ -25,6 +33,13 @@ func GlobalRateLimiter() fiber.Handler {
 
 // GlobalRateLimiterMinute creates a new rate limiter for global requests per minute.
 func GlobalRateLimiterMinute() fiber.Handler {
+	// Disable rate limiting in test environment
+	if os.Getenv("ENV") == "test" {
+		return func(c *fiber.Ctx) error {
+			return c.Next()
+		}
+	}
+
 	return limiter.New(limiter.Config{
 		Max:        50,
 		Expiration: 1 * time.Minute,
@@ -41,6 +56,13 @@ func GlobalRateLimiterMinute() fiber.Handler {
 
 // UserCreateRateLimiter creates a new rate limiter for user creation.
 func UserCreateRateLimiter() fiber.Handler {
+	// Disable rate limiting in test environment
+	if os.Getenv("ENV") == "test" {
+		return func(c *fiber.Ctx) error {
+			return c.Next()
+		}
+	}
+
 	return limiter.New(limiter.Config{
 		Max:        2,
 		Expiration: 1 * time.Minute,
@@ -57,6 +79,13 @@ func UserCreateRateLimiter() fiber.Handler {
 
 // GroupCreateRateLimiter creates a new rate limiter for group creation.
 func GroupCreateRateLimiter() fiber.Handler {
+	// Disable rate limiting in test environment
+	if os.Getenv("ENV") == "test" {
+		return func(c *fiber.Ctx) error {
+			return c.Next()
+		}
+	}
+
 	return limiter.New(limiter.Config{
 		Max:        2,
 		Expiration: 1 * time.Minute,

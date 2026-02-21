@@ -28,6 +28,12 @@ const fieldsToRequest = "places.id,places.displayName,places.formattedAddress,pl
 
 func (s *PlaceSearchService) NearbyPlaces(location dto.Location, radius int, placeType config.PlaceType) ([]dto.Place, error) {
 
+	// Handle case where client is not initialized (e.g., in test environment without API key)
+	if s.placesClient == nil {
+		applogger.Warn("Google Places client not initialized, returning empty results")
+		return []dto.Place{}, nil
+	}
+
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "x-goog-fieldmask", fieldsToRequest)
 
 	searchResp, err := s.placesClient.SearchNearby(

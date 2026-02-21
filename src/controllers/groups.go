@@ -215,6 +215,9 @@ func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupReque
 		group.Name = req.Name
 	}
 	if req.Type != "" {
+		if groupTypePrivacyLevel(req.Type) < 0 {
+		    return nil, fiber.NewError(fiber.StatusBadRequest, "Invalid group type")
+		}
 		newTypePrivacyLevel := groupTypePrivacyLevel(req.Type)
 		currentTypePrivacyLevel := groupTypePrivacyLevel(group.Type)
 		if newTypePrivacyLevel >= 0 && currentTypePrivacyLevel >= 0 && newTypePrivacyLevel < currentTypePrivacyLevel {

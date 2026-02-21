@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
 	"github.com/championswimmer/api.midpoint.place/tests"
 	"github.com/gofiber/fiber/v2"
@@ -52,7 +53,8 @@ func TestGroupsRoute_UpdateGroup(t *testing.T) {
 			groupIDOrCode: groupCode,
 			updateBody: []byte(`{
 				"name": "Updated Group 2",
-				"radius": 1200
+				"radius": 1200,
+				"place_types": ["cafe", "park", "museum"]
 			}`),
 			expectedStatus: fiber.StatusAccepted,
 			checkResponse: func(t *testing.T, body []byte) {
@@ -61,6 +63,7 @@ func TestGroupsRoute_UpdateGroup(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Equal(t, "Updated Group 2", updateResp.Name)
 				assert.Equal(t, 1200, updateResp.Radius)
+				assert.Equal(t, []config.PlaceType{config.PlaceTypeCafe, config.PlaceTypePark, config.PlaceTypeMuseum}, updateResp.PlaceTypes)
 			},
 		},
 	}

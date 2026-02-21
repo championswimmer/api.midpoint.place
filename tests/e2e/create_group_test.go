@@ -31,7 +31,8 @@ func TestGroupsRoute_CreateGroup(t *testing.T) {
 			requestBody: []byte(`{
 				"name": "Test Group",
 				"type": "public",
-				"radius": 1200
+				"radius": 1200,
+				"place_types": ["restaurant", "museum", "bookstore"]
 			}`),
 			expectedStatus: fiber.StatusCreated,
 			checkResponse: func(t *testing.T, body []byte) {
@@ -41,6 +42,7 @@ func TestGroupsRoute_CreateGroup(t *testing.T) {
 				assert.Equal(t, "Test Group", groupResp.Name)
 				assert.Equal(t, config.GroupTypePublic, groupResp.Type)
 				assert.Equal(t, 1200, groupResp.Radius)
+				assert.Equal(t, []config.PlaceType{config.PlaceTypeRestaurant, config.PlaceTypeMuseum, config.PlaceTypeBookstore}, groupResp.PlaceTypes)
 				assert.Equal(t, createdUser.ID, groupResp.Creator.ID)
 				assert.Equal(t, createdUser.DisplayName, groupResp.Creator.DisplayName)
 				createdGroup = groupResp

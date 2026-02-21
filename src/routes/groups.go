@@ -105,6 +105,9 @@ func updateGroup(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(err.(*fiber.Error).Code).JSON(dto.CreateErrorResponse(err.(*fiber.Error).Code, err.Error()))
 	}
+	if req.PlaceTypes != nil {
+		_triggerGroupMidpointUpdate(group)
+	}
 
 	return ctx.Status(fiber.StatusAccepted).JSON(group)
 }
@@ -232,13 +235,7 @@ func _triggerGroupMidpointUpdate(group *dto.GroupResponse) {
 	if err != nil {
 		applogger.Error("Error deleting existing group places", err)
 	}
-	placeTypes := []config.PlaceType{
-		config.PlaceTypeRestaurant,
-		config.PlaceTypeBar,
-		config.PlaceTypeCafe,
-		config.PlaceTypePark,
-	}
-	for _, placeType := range placeTypes {
+	for _, placeType := range group.PlaceTypes {
 		// TODO: can be parallelized?
 		func(placeType config.PlaceType) {
 			err := _populateGroupPlaces(groupResp, placeType)

@@ -25,3 +25,8 @@ func TestPlaceSearchService_NearbyPlaces(t *testing.T) {
 		applogger.Info("place", place)
 	})
 }
+
+func Test_getIncludedTypes(t *testing.T) {
+	assert.Equal(t, []string{"museum"}, _getIncludedTypes(config.PlaceTypeMuseum))
+	assert.Equal(t, []string{"book_store"}, _getIncludedTypes(config.PlaceTypeBookstore))
+}

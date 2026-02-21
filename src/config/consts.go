@@ -27,4 +27,22 @@ const (
 	PlaceTypeBar        PlaceType = "bar"
 	PlaceTypeCafe       PlaceType = "cafe"
 	PlaceTypePark       PlaceType = "park"
+	PlaceTypeMuseum     PlaceType = "museum"
+	PlaceTypeBookstore  PlaceType = "bookstore"
 )
+
+var DefaultGroupPlaceTypes = []PlaceType{
+	PlaceTypeRestaurant,
+	PlaceTypeBar,
+	PlaceTypeCafe,
+	PlaceTypePark,
+}
+
+func IsSupportedPlaceType(placeType PlaceType) bool {
+	switch placeType {
+	case PlaceTypeRestaurant, PlaceTypeBar, PlaceTypeCafe, PlaceTypePark, PlaceTypeMuseum, PlaceTypeBookstore:
+		return true
+	default:
+		return false
+	}
+}

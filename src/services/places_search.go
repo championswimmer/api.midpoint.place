@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	places "cloud.google.com/go/maps/places/apiv1"
+	"github.com/googleapis/gax-go/v2"
 	placespb "cloud.google.com/go/maps/places/apiv1/placespb"
 	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
@@ -13,20 +13,37 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// placesNearbyClient defines the interface for searching nearby places
+type placesNearbyClient interface {
+	SearchNearby(ctx context.Context, req *placespb.SearchNearbyRequest, opts ...gax.CallOption) (*placespb.SearchNearbyResponse, error)
+}
+
 type PlaceSearchService struct {
-	placesClient *places.Client
+	placesClient placesNearbyClient
 }
 
 func NewPlaceSearchService() *PlaceSearchService {
-
 	return &PlaceSearchService{
 		placesClient: GetGooglePlacesClient(),
+	}
+}
+
+// NewPlaceSearchServiceWithClient creates a PlaceSearchService with an injected client (for testing)
+func NewPlaceSearchServiceWithClient(client placesNearbyClient) *PlaceSearchService {
+	return &PlaceSearchService{
+		placesClient: client,
 	}
 }
 
 const fieldsToRequest = "places.id,places.displayName,places.formattedAddress,places.googleMapsUri,places.primaryTypeDisplayName,places.rating,places.location,places.shortFormattedAddress"
 
 func (s *PlaceSearchService) NearbyPlaces(location dto.Location, radius int, placeType config.PlaceType) ([]dto.Place, error) {
+
+	// Handle case where client is not initialized (e.g., in test environment without API key)
+	if s.placesClient == nil {
+		applogger.Warn("Google Places client not initialized, returning empty results")
+		return []dto.Place{}, nil
+	}
 
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "x-goog-fieldmask", fieldsToRequest)
 

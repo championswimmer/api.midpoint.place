@@ -8,13 +8,23 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
 
+// isTestEnv checks if we're running in test environment
+func isTestEnv() bool {
+	return os.Getenv("ENV") == "test"
+}
+
+// noOpHandler returns a no-op handler that just passes through
+func noOpHandler() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		return c.Next()
+	}
+}
+
 // GlobalRateLimiter creates a new rate limiter for global requests.
 func GlobalRateLimiter() fiber.Handler {
 	// Disable rate limiting in test environment
-	if os.Getenv("ENV") == "test" {
-		return func(c *fiber.Ctx) error {
-			return c.Next()
-		}
+	if isTestEnv() {
+		return noOpHandler()
 	}
 
 	return limiter.New(limiter.Config{
@@ -34,10 +44,8 @@ func GlobalRateLimiter() fiber.Handler {
 // GlobalRateLimiterMinute creates a new rate limiter for global requests per minute.
 func GlobalRateLimiterMinute() fiber.Handler {
 	// Disable rate limiting in test environment
-	if os.Getenv("ENV") == "test" {
-		return func(c *fiber.Ctx) error {
-			return c.Next()
-		}
+	if isTestEnv() {
+		return noOpHandler()
 	}
 
 	return limiter.New(limiter.Config{
@@ -57,10 +65,8 @@ func GlobalRateLimiterMinute() fiber.Handler {
 // UserCreateRateLimiter creates a new rate limiter for user creation.
 func UserCreateRateLimiter() fiber.Handler {
 	// Disable rate limiting in test environment
-	if os.Getenv("ENV") == "test" {
-		return func(c *fiber.Ctx) error {
-			return c.Next()
-		}
+	if isTestEnv() {
+		return noOpHandler()
 	}
 
 	return limiter.New(limiter.Config{
@@ -80,10 +86,8 @@ func UserCreateRateLimiter() fiber.Handler {
 // GroupCreateRateLimiter creates a new rate limiter for group creation.
 func GroupCreateRateLimiter() fiber.Handler {
 	// Disable rate limiting in test environment
-	if os.Getenv("ENV") == "test" {
-		return func(c *fiber.Ctx) error {
-			return c.Next()
-		}
+	if isTestEnv() {
+		return noOpHandler()
 	}
 
 	return limiter.New(limiter.Config{

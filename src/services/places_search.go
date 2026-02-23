@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	places "cloud.google.com/go/maps/places/apiv1"
+	"github.com/googleapis/gax-go/v2"
 	placespb "cloud.google.com/go/maps/places/apiv1/placespb"
 	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
@@ -13,14 +13,25 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// placesNearbyClient defines the interface for searching nearby places
+type placesNearbyClient interface {
+	SearchNearby(ctx context.Context, req *placespb.SearchNearbyRequest, opts ...gax.CallOption) (*placespb.SearchNearbyResponse, error)
+}
+
 type PlaceSearchService struct {
-	placesClient *places.Client
+	placesClient placesNearbyClient
 }
 
 func NewPlaceSearchService() *PlaceSearchService {
-
 	return &PlaceSearchService{
 		placesClient: GetGooglePlacesClient(),
+	}
+}
+
+// NewPlaceSearchServiceWithClient creates a PlaceSearchService with an injected client (for testing)
+func NewPlaceSearchServiceWithClient(client placesNearbyClient) *PlaceSearchService {
+	return &PlaceSearchService{
+		placesClient: client,
 	}
 }
 

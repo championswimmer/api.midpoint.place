@@ -58,6 +58,19 @@ func generateRandomSecret() string {
 	return fmt.Sprintf("%06d", n.Int64()+100000)
 }
 
+func groupTypePrivacyLevel(groupType config.GroupType) int {
+	switch groupType {
+	case config.GroupTypePublic:
+		return 0
+	case config.GroupTypeProtected:
+		return 1
+	case config.GroupTypePrivate:
+		return 2
+	default:
+		return -1
+	}
+}
+
 func (c *GroupsController) GetGroupByIDorCode(groupIDorCode string, includeUsers bool, includePlaces bool) (*dto.GroupResponse, error) {
 	var group models.Group
 
@@ -213,6 +226,23 @@ func (c *GroupsController) UpdateGroup(groupID string, req *dto.UpdateGroupReque
 		group.Name = req.Name
 	}
 	if req.Type != "" {
+		if groupTypePrivacyLevel(req.Type) < 0 {
+		    return nil, fiber.NewError(fiber.StatusBadRequest, "Invalid group type")
+		}
+		newTypePrivacyLevel := groupTypePrivacyLevel(req.Type)
+		currentTypePrivacyLevel := groupTypePrivacyLevel(group.Type)
+		if newTypePrivacyLevel >= 0 && currentTypePrivacyLevel >= 0 && newTypePrivacyLevel < currentTypePrivacyLevel {
+			var memberCount int64
+			if err := c.db.Model(&models.GroupUser{}).
+				Where("group_id = ?", group.ID).
+				Where("deleted_at IS NULL").
+				Count(&memberCount).Error; err != nil {
+				return nil, fiber.NewError(fiber.StatusInternalServerError, "Failed to fetch group member count")
+			}
+			if memberCount > 1 {
+				return nil, fiber.NewError(fiber.StatusUnprocessableEntity, "Cannot make group privacy more open when group has 2 or more members")
+			}
+		}
 		group.Type = req.Type
 	}
 	if req.Secret != "" {

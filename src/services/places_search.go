@@ -70,6 +70,10 @@ func _getIncludedTypes(placeType config.PlaceType) []string {
 		return []string{"cafe", "coffee_shop"}
 	case config.PlaceTypePark:
 		return []string{"park", "garden"}
+	case config.PlaceTypeMuseum:
+		return []string{"museum", "art_gallery", "history_museum"}
+	case config.PlaceTypeBookstore:
+		return []string{"bookstore", "book_store"}
 	}
 	return []string{}
 }

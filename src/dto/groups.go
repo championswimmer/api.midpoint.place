@@ -3,17 +3,19 @@ package dto
 import "github.com/championswimmer/api.midpoint.place/src/config"
 
 type CreateGroupRequest struct {
-	Name   string           `json:"name" validate:"required"`
-	Type   config.GroupType `json:"type" validate:"omitempty,oneof=public protected private"`
-	Secret string           `json:"secret" validate:"omitempty"`
-	Radius int              `json:"radius" validate:"omitempty,min=0"`
+	Name       string              `json:"name" validate:"required"`
+	Type       config.GroupType    `json:"type" validate:"omitempty,oneof=public protected private"`
+	Secret     string              `json:"secret" validate:"omitempty"`
+	Radius     int                 `json:"radius" validate:"omitempty,min=0"`
+	PlaceTypes []config.PlaceType  `json:"place_types" validate:"omitempty"`
 }
 
 type UpdateGroupRequest struct {
-	Name   string           `json:"name" validate:"omitempty"`
-	Type   config.GroupType `json:"type" validate:"omitempty,oneof=public protected private"`
-	Secret string           `json:"secret" validate:"omitempty"`
-	Radius int              `json:"radius" validate:"omitempty,min=0"`
+	Name       string              `json:"name" validate:"omitempty"`
+	Type       config.GroupType    `json:"type" validate:"omitempty,oneof=public protected private"`
+	Secret     string              `json:"secret" validate:"omitempty"`
+	Radius     int                 `json:"radius" validate:"omitempty,min=0"`
+	PlaceTypes []config.PlaceType  `json:"place_types" validate:"omitempty"`
 }
 
 type UpdateGroupMidpointRequest struct {
@@ -34,6 +36,7 @@ type GroupResponse struct {
 	MidpointLatitude  float64              `json:"midpoint_latitude"`
 	MidpointLongitude float64              `json:"midpoint_longitude"`
 	Radius            int                  `json:"radius"`
+	PlaceTypes        []config.PlaceType   `json:"place_types"`
 	MemberCount       int                  `json:"member_count,omitempty"`
 	Members           []GroupUserResponse  `json:"members,omitempty"`
 	Places            []GroupPlaceResponse `json:"places,omitempty"`

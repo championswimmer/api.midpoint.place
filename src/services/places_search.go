@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 
-	places "cloud.google.com/go/maps/places/apiv1"
 	placespb "cloud.google.com/go/maps/places/apiv1/placespb"
 	"github.com/championswimmer/api.midpoint.place/src/config"
 	"github.com/championswimmer/api.midpoint.place/src/dto"
@@ -14,7 +13,7 @@ import (
 )
 
 type PlaceSearchService struct {
-	placesClient *places.Client
+	placesClient PlacesClientInterface
 }
 
 func NewPlaceSearchService() *PlaceSearchService {

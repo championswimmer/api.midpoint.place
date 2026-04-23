@@ -19,6 +19,7 @@ var JWTSigningKey string
 var JWTExpirationDays int
 
 var GoogleMapsAPIKey string
+var UseMockPlaces bool
 
 var GroupsQueryLimit int
 
@@ -44,6 +45,7 @@ func init() {
 	JWTExpirationDays = lo.Must(strconv.Atoi(os.Getenv("JWT_EXPIRATION_DAYS")))
 
 	GoogleMapsAPIKey = os.Getenv("GOOGLE_MAPS_API_KEY")
+	UseMockPlaces = os.Getenv("USE_MOCK_PLACES") == "true"
 
 	GroupsQueryLimit = lo.Must(strconv.Atoi(os.Getenv("GROUPS_QUERY_LIMIT")))
 }
